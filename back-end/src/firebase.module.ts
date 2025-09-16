@@ -19,7 +19,7 @@ import { getAuth } from 'firebase/auth';
           messagingSenderId: configService.get('FIREBASE_MESSAGING_SENDER_ID'),
           appId: configService.get('FIREBASE_APP_ID'),
         };
-        
+
         const app = initializeApp(firebaseConfig);
         return getFirestore(app);
       },
@@ -36,13 +36,19 @@ import { getAuth } from 'firebase/auth';
           messagingSenderId: configService.get('FIREBASE_MESSAGING_SENDER_ID'),
           appId: configService.get('FIREBASE_APP_ID'),
         };
-        
+
         const app = initializeApp(firebaseConfig);
+        console.log('API Key:', configService.get('FIREBASE_API_KEY'));
+        console.log('Project ID:', configService.get('FIREBASE_PROJECT_ID'));
+
         return getAuth(app);
       },
       inject: [ConfigService],
     },
+
   ],
   exports: ['FIRESTORE', 'FIREBASE_AUTH'],
 })
-export class FirebaseModule {}
+
+
+export class FirebaseModule { }
