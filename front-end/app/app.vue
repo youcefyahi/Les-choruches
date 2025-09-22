@@ -1,9 +1,14 @@
 <template>
   <div>
-   <Form/>
+    <!-- <Form />
+    <Connexion /> -->
+    <NuxtPage/>
+
   </div>
 </template>
 
 <script setup>
-import Form from './form.vue'
+import Form from "./form.vue";
+import Connexion from "./Connexion.vue";
+
 </script>
