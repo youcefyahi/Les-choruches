@@ -39,6 +39,7 @@ de ruches)
 - Export réglementaire : PDF et Excel conformes à la réglementation française
 - Historique complet : Suivi chronologique de chaque rucher
 - Géolocalisation : Position GPS des ruchers avec cartes intégrées
+
 2.4 Fiches de visite structurées
 - Informations de base : Lieu, date, heure, durée
 - Checklist standardisée : Actions à effectuer selon la saison

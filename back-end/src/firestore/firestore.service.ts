@@ -1,15 +1,15 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { 
-  Firestore, 
-  collection, 
-  doc, 
-  addDoc, 
-  getDoc, 
-  getDocs, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where 
+import {
+  Firestore,
+  collection,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where
 } from 'firebase/firestore';
 // import { Deplacement } from '../Models/Deplacement';
 // import { Recolte } from '../Models/Recolte';
@@ -22,7 +22,7 @@ import { RegistreElevage } from '../Models/RegistreElevage';
 
 @Injectable()
 export class FirestoreService {
-  constructor(@Inject('FIRESTORE') private firestore: Firestore) {}
+  constructor(@Inject('FIRESTORE') private firestore: Firestore) { }
 
   async createApiculteur(apiculteur: Omit<Apiculteur, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const now = new Date();
@@ -37,9 +37,9 @@ export class FirestoreService {
   async getApiculteur(id: string): Promise<Apiculteur | null> {
     const docRef = doc(this.firestore, 'apiculteurs', id);
     const docSnap = await getDoc(docRef);
-    
+
     if (!docSnap.exists()) return null;
-    
+
     return {
       id: docSnap.id,
       ...docSnap.data(),
@@ -49,9 +49,9 @@ export class FirestoreService {
   async getApiculteurByEmail(email: string): Promise<Apiculteur | null> {
     const q = query(collection(this.firestore, 'apiculteurs'), where('email', '==', email));
     const querySnapshot = await getDocs(q);
-    
+
     if (querySnapshot.empty) return null;
-    
+
     const doc = querySnapshot.docs[0];
     return {
       id: doc.id,
@@ -80,10 +80,22 @@ export class FirestoreService {
   async getRegistresByApiculteur(apiculteurId: string): Promise<RegistreElevage[]> {
     const q = query(collection(this.firestore, 'registres'), where('apiculteurId', '==', apiculteurId));
     const querySnapshot = await getDocs(q);
-    
+
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     } as RegistreElevage));
+  }
+
+  async getRegistre(id: string): Promise<RegistreElevage | null> {
+    const docRef = doc(this.firestore, 'registres', id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) return null;
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as RegistreElevage;
   }
 }

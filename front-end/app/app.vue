@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <Form />
-    <Connexion /> -->
+    <Form />
+    <Connexion />
     <NuxtPage/>
 
   </div>
