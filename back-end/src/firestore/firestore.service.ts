@@ -46,6 +46,8 @@ export class FirestoreService {
     } as Apiculteur;
   }
 
+
+
   async getApiculteurByEmail(email: string): Promise<Apiculteur | null> {
     const q = query(collection(this.firestore, 'apiculteurs'), where('email', '==', email));
     const querySnapshot = await getDocs(q);
@@ -67,6 +69,7 @@ export class FirestoreService {
     });
   }
 
+
   async createRegistre(registre: Omit<RegistreElevage, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const now = new Date();
     const docRef = await addDoc(collection(this.firestore, 'registres'), {
@@ -75,6 +78,24 @@ export class FirestoreService {
       updatedAt: now,
     });
     return docRef.id;
+  }
+
+  async addObservationToRegistre(registreId: string, observation: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const observations = data.observations || [];
+    observations.push(observation);
+
+    await updateDoc(docRef, {
+      observations,
+      updatedAt: new Date()
+    });
   }
 
   async getRegistresByApiculteur(apiculteurId: string): Promise<RegistreElevage[]> {
@@ -96,6 +117,27 @@ export class FirestoreService {
     return {
       id: docSnap.id,
       ...docSnap.data(),
+    } as RegistreElevage;
+  }
+
+  async updateRegistre(id: string, data: Partial<RegistreElevage>): Promise<RegistreElevage> {
+    const docRef = doc(this.firestore, 'registres', id);
+
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+
+    // Récupérer le document mis à jour
+    const updatedDoc = await getDoc(docRef);
+
+    if (!updatedDoc.exists()) {
+      throw new Error('Registre non trouvé');
+    }
+
+    return {
+      id: updatedDoc.id,
+      ...updatedDoc.data(),
     } as RegistreElevage;
   }
 }

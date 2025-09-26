@@ -4,7 +4,7 @@ import { RegistreElevage } from '../Models/RegistreElevage';
 
 @Injectable()
 export class RegistresService {
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(private firestoreService: FirestoreService) { }
 
   async createRegistre(registreData: Omit<RegistreElevage, 'id' | 'createdAt' | 'updatedAt'>) {
     try {
@@ -28,6 +28,21 @@ export class RegistresService {
 
     } catch (error) {
       throw new Error(`Erreur lors de la création du registre: ${error.message}`);
+    }
+  }
+
+  async addObservation(registreId: string, observationData: { date: Date; content: string }) {
+    try {
+      const observation = {
+        id: Date.now().toString(),
+        ...observationData
+      };
+
+      await this.firestoreService.addObservationToRegistre(registreId, observation);
+
+      return observation;
+    } catch (error) {
+      throw new Error(`Error adding observation: ${error.message}`);
     }
   }
 
@@ -55,7 +70,7 @@ export class RegistresService {
   async getRegistre(registreId: string) {
     try {
       const registre = await this.firestoreService.getRegistre(registreId);
-      
+
       if (!registre) {
         throw new Error('Registre introuvable');
       }
@@ -69,4 +84,9 @@ export class RegistresService {
       throw new Error(`Erreur lors de la récupération du registre: ${error.message}`);
     }
   }
+
+  async updateRegistre(id: string, data: Partial<RegistreElevage>) {
+    return await this.firestoreService.updateRegistre(id, data);
+  }
+
 }
