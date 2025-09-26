@@ -1,0 +1,166 @@
+CAHIER DES CHARGES
+Application Apicole - Les Écoruches
+
+1. PRÉSENTATION DU PROJET
+1.1 Contexte
+Client : Les Écoruches
+Type de structure : Apiculture d'entreprise
+Objectif : Développement d'une application web et mobile pour la gestion des
+ruchers d'entreprise
+1.2 Description générale
+Les Écoruches installe et suit des ruches en entreprise. L'application doit
+permettre aux apiculteurs de gérer efficacement leurs visites, de communiquer
+avec les entreprises clientes et de centraliser tous les contenus pédagogiques
+nécessaires à leur activité.
+1.3 Objectifs du projet
+- Centraliser la gestion des ruchers et des visites apicoles
+- Faciliter la communication entre apiculteurs et entreprises
+- Création d'automatisation
+- Valoriser l'activité via des posts LinkedIn optimisés
+- Respecter la réglementation apicole française
+
+2. FONCTIONNALITÉS DÉTAILLÉES
+2.1 Module d'authentification et sécurité
+- Connexion sécurisée : Authentification par email avec magic link
+- Gestion des rôles : Apiculteur / Administrateur
+- Sécurité RGPD : Chiffrement des données, consentements, purge sur
+demande
+- Accès restreint : Chaque apiculteur accède uniquement à ses entreprises/
+ruchers
+2.2 Tableau de bord apiculteur
+- Vue d'ensemble : Accès rapide aux modules principaux
+- Statistiques : Nombre de ruchers, visites du mois, tâches en cours
+- Notifications : Alertes importantes, rappels de visites
+- Navigation intuitive : Menu principal avec icônes claires
+2.3 Gestion des ruchers et registre d'élevage
+- Création de ruchers : Informations complètes (localisation, entreprise, nombre
+de ruches)
+- Registre d'élevage numérique : Auto-alimenté par les fiches de visite
+- Export réglementaire : PDF et Excel conformes à la réglementation française
+- Historique complet : Suivi chronologique de chaque rucher
+- Géolocalisation : Position GPS des ruchers avec cartes intégrées
+2.4 Fiches de visite structurées
+- Informations de base : Lieu, date, heure, durée
+- Checklist standardisée : Actions à effectuer selon la saison
+- Notes libres : Observations personnalisées
+- Médias : Photos et enregistrements audio
+- État des colonies : Force, comportement, production
+2.5 Messagerie interne
+- Communication par entreprise : Messages groupés par client
+- Messagerie par visite : Discussions liées à une visite spécifique
+- Types de messages : Texte, audio, photos
+- Notifications temps réel : Alertes push et email
+- Historique : Conservation des échanges
+2.6 Gestion des contacts
+- Carnet d'adresses : Contacts par entreprise
+- Informations complètes : Coordonnées, préférences, historique
+- Intégration : Synchronisation avec l'agenda
+- Recherche : Filtres par entreprise, nom, fonction
+2.7 Agenda et planification
+- Création de RDV : Visites programmées avec rappels
+- Synchronisation : Google Calendar et autres calendriers
+- Planification : Optimisation des trajets entre ruchers
+- Notifications : Rappels automatiques
+- Statuts : Planifié, en cours, terminé, reporté
+2.8 Contenus pédagogiques
+- Guides mensuels : Contenus interactifs par saison
+- Checklists : Listes de vérification personnalisables
+- Notifications : Alertes pour les actions saisonnières
+- Mise à jour : Contenus modifiables par l'administrateur
+- Multimédia : Vidéos, images, documents PDF
+2.9 Gestion des factures
+- Upload simple : Dépôt de fichiers PDF
+- Organisation : Classement par entreprise et période
+- Statuts : Brouillon, envoyée, payée
+- Recherche : Filtres par date, entreprise, montant
+2.10 Intelligence Artificielle intégrée
+- Transcription audio : Conversion des enregistrements en texte
+- Envoie par mail du compte rendu reformulé directement aux contacts de l'entreprise concernés directement depuis l'application.
+- Posts LinkedIn : Création automatique de contenus valorisants
+- Validation admin : Contrôle avant publication
+- Publication directement de l'appli : sans devoir faire de « copier/coller »
+- Apprentissage : Amélioration continue des suggestions
+2.11 Console d'administration
+- Gestion des utilisateurs : Création, modification, suppression des comptes
+- Gestion des contenus : Ajout/édition des guides pédagogiques
+- Validation LinkedIn : Contrôle des posts générés
+- Supervision : Journal d'activité, statistiques, exports
+- Configuration : Paramètres généraux de l'application
+3. ARCHITECTURE TECHNIQUE
+3.1 Stack technologique
+- Frontend Web : React js
+- Backend API : Node.js avec Express
+- Base de données : PostgreSQL avec Sequelize ORM
+- Authentification : JWT
+- IA : Intégration LLM
+- Déploiement : VPS Ubuntu avec Nginx
+3.2 Architecture mobile
+- PWA : Application web progressive pour mobile
+- Cache local : SQLite pour le mode hors-ligne
+- Synchronisation : Mise à jour automatique en ligne
+- Notifications : Service Worker pour les alertes push
+3.3 Sécurité et conformité
+- Chiffrement : AES-256 pour les données sensibles
+- HTTPS : Certificat SSL obligatoire
+- RGPD : Gestion des consentements et droit à l'oubli
+- Audit : Logs de sécurité et traçabilité des actions
+4. CONTRAINTES ET EXIGENCES
+4.1 Contraintes techniques
+- Mode hors-ligne : Fonctionnement sans connexion internet
+- Responsive : Adaptation mobile, tablette, desktop
+- Performance : Temps de chargement < 3 secondes
+- Compatibilité : Chrome, Safari, Firefox, Edge
+4.2 Contraintes réglementaires
+- Conformité apicole : Respect des normes françaises
+- Traçabilité : Historique complet des interventions
+- Exports : Formats réglementaires (PDF, Excel)
+- Conservation : Archivage des données selon la durée légale
+4.3 Contraintes utilisateur
+- Simplicité : Interface intuitive pour apiculteurs
+- Rapidité : Saisie rapide des informations
+- Mobilité : Utilisation sur le terrain
+- Formation : Documentation et support utilisateur
+5. PHASES DE DÉVELOPPEMENT
+5.1 Développement complet
+- Authentification et gestion des utilisateurs
+- Tableau de bord apiculteur
+- Fiches de visite complètes
+- Messagerie interne
+- Gestion des contacts
+- Console d'administration
+- Agenda et planification
+- Contenus pédagogiques
+- Gestion des factures
+- Mode hors-ligne mobile
+- Synchronisation des données
+- Intégration de l'IA
+- Génération automatique de contenus
+- Tests et optimisations
+6. LIVRABLES
+6.1 Développement
+- Application web complète (React/Node.js)
+- Application mobile PWA
+- Base de données PostgreSQL
+- Documentation technique
+- Code source commenté
+6.2 Formation et support
+- Formation utilisateurs
+- Documentation utilisateur
+- Support technique (3 mois inclus)
+- Maintenance (optionnelle)
+6.3 Déploiement
+- Installation sur serveur
+- Configuration SSL et sécurité
+- Sauvegarde automatique
+- Monitoring et alertes
+7. GARANTIES ET SUPPORT
+7.1 Garanties
+- Fonctionnalités conformes au cahier des charges
+- Code source fourni et documenté
+- Formation utilisateurs incluse
+- Support technique 3 mois inclus
+7.2 Évolutivité
+- Architecture modulaire pour futures évolutions
+- Possibilité d'ajout de fonctionnalités
+- Migration vers applications natives possible
+- Scalabilité pour croissance de l'activité
