@@ -1,0 +1,89 @@
+import { Injectable, Inject } from '@nestjs/common';
+import { 
+  Firestore, 
+  collection, 
+  doc, 
+  addDoc, 
+  getDoc, 
+  getDocs, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where 
+} from 'firebase/firestore';
+// import { Deplacement } from '../Models/Deplacement';
+// import { Recolte } from '../Models/Recolte';
+// import { TraitementVarroa } from '../Models/TraitementVarroa';
+// import { Nourrissement } from '../Models/Nourrissement';
+// import { MaladieTraitement } from '../Models/MaladieTraitement';
+// import { Observation } from '../Models/Observation';
+import { Apiculteur } from '../Models/Apiculteur';
+import { RegistreElevage } from '../Models/RegistreElevage';
+
+@Injectable()
+export class FirestoreService {
+  constructor(@Inject('FIRESTORE') private firestore: Firestore) {}
+
+  async createApiculteur(apiculteur: Omit<Apiculteur, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'apiculteurs'), {
+      ...apiculteur,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  async getApiculteur(id: string): Promise<Apiculteur | null> {
+    const docRef = doc(this.firestore, 'apiculteurs', id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return null;
+    
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as Apiculteur;
+  }
+
+  async getApiculteurByEmail(email: string): Promise<Apiculteur | null> {
+    const q = query(collection(this.firestore, 'apiculteurs'), where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) return null;
+    
+    const doc = querySnapshot.docs[0];
+    return {
+      id: doc.id,
+      ...doc.data(),
+    } as Apiculteur;
+  }
+
+  async updateApiculteur(id: string, data: Partial<Apiculteur>): Promise<void> {
+    const docRef = doc(this.firestore, 'apiculteurs', id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+
+  async createRegistre(registre: Omit<RegistreElevage, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'registres'), {
+      ...registre,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  async getRegistresByApiculteur(apiculteurId: string): Promise<RegistreElevage[]> {
+    const q = query(collection(this.firestore, 'registres'), where('apiculteurId', '==', apiculteurId));
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RegistreElevage));
+  }
+}
