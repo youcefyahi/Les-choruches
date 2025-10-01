@@ -218,5 +218,24 @@ export class FirestoreService {
       updatedAt: new Date()
     });
   }
+  // // MALADIT ET TRAITEMENT // // 
+
+  async addMaladieTraitementToRegistre(registreId: string, maladieTraitement: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const maladiesTraitements = data.maladiesTraitements || [];
+    maladiesTraitements.push(maladieTraitement);
+
+    await updateDoc(docRef, {
+      maladiesTraitements,
+      updatedAt: new Date()
+    });
+  }
 
 }

@@ -73,4 +73,14 @@ export class RegistresController {
     return await this.registresService.addNourrissement(registreId, nourrissement);
   }
 
+  // // MALADIE & TRAITEMENT // // 
+
+  @Post(':id/maladies-traitements')
+  async addMaladieTraitement(
+    @Param('id') registreId: string,
+    @Body() maladieTraitement: { date: Date; maladie: string; traitement?: string }
+  ) {
+    return await this.registresService.addMaladieTraitement(registreId, maladieTraitement);
+  }
+
 }

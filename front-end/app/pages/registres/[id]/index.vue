@@ -303,6 +303,44 @@
             </div>
           </div>
         </div>
+        <!-- Maladies et Traitements -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium text-gray-900">Maladies et Traitements</h3>
+              <button @click="openMaladieTraitementModal"
+                class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+                + Ajouter
+              </button>
+              <!-- Modal Maladie Traitement -->
+              <MaladieTraitementModal :is-open="isMaladieTraitementModalOpen" :registre-id="registreId"
+                @close="closeMaladieTraitementModal" @maladie-traitement-added="onMaladieTraitementAdded" />
+            </div>
+          </div>
+          <div class="p-6">
+            <div v-if="registre.maladiesTraitements?.length > 0" class="space-y-3">
+              <div v-for="maladieTraitement in registre.maladiesTraitements.slice(-3)" :key="maladieTraitement.id"
+                class="py-2 border-b border-gray-100 last:border-b-0">
+                <p class="text-sm font-medium text-gray-900">{{ maladieTraitement.maladie }}</p>
+                <p v-if="maladieTraitement.traitement" class="text-sm text-gray-600 mt-1">{{
+                  maladieTraitement.traitement }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ formatDate(maladieTraitement.date) }}</p>
+              </div>
+              <button v-if="registre.maladiesTraitements.length > 3"
+                class="text-sm text-yellow-600 hover:text-yellow-700">
+                Voir tous ({{ registre.maladiesTraitements.length }})
+              </button>
+            </div>
+            <div v-else class="text-center py-8 text-gray-500">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              <p class="text-sm">Aucune maladie enregistrée</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -315,6 +353,7 @@ import DeplacementModal from '~/components/DeplacementModal.vue'
 import RecolteModal from '~/components/RecolteModal.vue'
 import TraitementVarroaModal from '~/components/TraitementVarroaModal.vue'
 import NourrissementModal from '~/components/NourrissementModal.vue'
+import MaladieTraitementModal from '~/components/MaladieTraitementModal.vue'
 
 
 
@@ -400,6 +439,23 @@ function closeNourrissementModal() {
 }
 
 async function onNourrissementAdded() {
+  await chargerRegistre()
+}
+
+// // MADALADIE ET TRAITEMENT // // 
+
+// MALADIE TRAITEMENT // 
+const isMaladieTraitementModalOpen = ref(false)
+
+function openMaladieTraitementModal() {
+  isMaladieTraitementModalOpen.value = true
+}
+
+function closeMaladieTraitementModal() {
+  isMaladieTraitementModalOpen.value = false
+}
+
+async function onMaladieTraitementAdded() {
   await chargerRegistre()
 }
 

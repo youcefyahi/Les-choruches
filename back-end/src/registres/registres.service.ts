@@ -157,4 +157,20 @@ export class RegistresService {
       throw new Error(`Error adding nourrissement: ${error.message}`);
     }
   }
+
+  // // MALADIE ET TRAITEMENT // // 
+  async addMaladieTraitement(registreId: string, maladieTraitementData: { date: Date; maladie: string; traitement?: string }) {
+    try {
+      const maladieTraitement = {
+        id: Date.now().toString(),
+        ...maladieTraitementData
+      };
+
+      await this.firestoreService.addMaladieTraitementToRegistre(registreId, maladieTraitement);
+
+      return maladieTraitement;
+    } catch (error) {
+      throw new Error(`Error adding maladie traitement: ${error.message}`);
+    }
+  }
 }
