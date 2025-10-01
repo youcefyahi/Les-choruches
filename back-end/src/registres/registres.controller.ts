@@ -33,4 +33,44 @@ export class RegistresController {
     return await this.registresService.updateRegistre(id, body);
   }
 
+  // // DEPLACEMENT // // 
+
+  @Post(':id/deplacements')
+  async addDeplacement(
+    @Param('id') registreId: string,
+    @Body() deplacement: { date: Date; nouvelleAdresse: string }
+  ) {
+    return await this.registresService.addDeplacement(registreId, deplacement);
+  }
+
+  // // DEPLACEMENT // // 
+
+  // // RECOLTE // // 
+
+  @Post(':id/recoltes')
+  async addRecolte(
+    @Param('id') registreId: string,
+    @Body() recolte: { date: Date; volume: number }
+  ) {
+    return await this.registresService.addRecolte(registreId, recolte);
+  }
+
+  // // TRAITEMENT // // 
+
+  @Post(':id/traitements-varroa')
+  async addTraitementVarroa(
+    @Param('id') registreId: string,
+    @Body() traitement: { date: Date; produit: string }
+  ) {
+    return await this.registresService.addTraitementVarroa(registreId, traitement);
+  }
+  // // NOURISEMENT // // 
+  @Post(':id/nourrissements')
+  async addNourrissement(
+    @Param('id') registreId: string,
+    @Body() nourrissement: { date: Date; quantite: number; produit: string }
+  ) {
+    return await this.registresService.addNourrissement(registreId, nourrissement);
+  }
+
 }

@@ -140,4 +140,83 @@ export class FirestoreService {
       ...updatedDoc.data(),
     } as RegistreElevage;
   }
+
+  // // DEPLACEMENT // // 
+  async addDeplacementToRegistre(registreId: string, deplacement: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const deplacements = data.deplacements || [];
+    deplacements.push(deplacement);
+
+    await updateDoc(docRef, {
+      deplacements,
+      updatedAt: new Date()
+    });
+  }
+
+  // // RECOLTE // // 
+
+  async addRecolteToRegistre(registreId: string, recolte: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const recoltes = data.recoltes || [];
+    recoltes.push(recolte);
+
+    await updateDoc(docRef, {
+      recoltes,
+      updatedAt: new Date()
+    });
+  }
+
+  // // TRAITEMENT // // 
+
+  async addTraitementVarroaToRegistre(registreId: string, traitement: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const traitementsVarroa = data.traitementsVarroa || [];
+    traitementsVarroa.push(traitement);
+
+    await updateDoc(docRef, {
+      traitementsVarroa,
+      updatedAt: new Date()
+    });
+  }
+
+  // // NOURISSEMENT // // 
+  async addNourrissementToRegistre(registreId: string, nourrissement: any) {
+    const docRef = doc(this.firestore, 'registres', registreId);
+    const registre = await getDoc(docRef);
+
+    if (!registre.exists()) {
+      throw new Error('Registre not found');
+    }
+
+    const data = registre.data();
+    const nourrissements = data.nourrissements || [];
+    nourrissements.push(nourrissement);
+
+    await updateDoc(docRef, {
+      nourrissements,
+      updatedAt: new Date()
+    });
+  }
+
 }

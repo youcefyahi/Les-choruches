@@ -128,9 +128,13 @@
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-medium text-gray-900">Déplacements</h3>
-              <button class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+              <button @click="openDeplacementModal" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
                 + Ajouter
               </button>
+              <!-- Modal Déplacement -->
+              <DeplacementModal :is-open="isDeplacementModalOpen" :registre-id="registreId"
+                @close="closeDeplacementModal" @deplacement-added="onDeplacementAdded" />
+
             </div>
           </div>
           <div class="p-6">
@@ -161,9 +165,14 @@
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-medium text-gray-900">Récoltes</h3>
-              <button class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+              <button @click="openRecolteModal" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
                 + Ajouter
               </button>
+
+              <!-- Modal Récolte -->
+              <RecolteModal :is-open="isRecolteModalOpen" :registre-id="registreId" @close="closeRecolteModal"
+                @recolte-added="onRecolteAdded" />
+
             </div>
           </div>
           <div class="p-6">
@@ -194,9 +203,12 @@
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-medium text-gray-900">Traitements Varroa</h3>
-              <button class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+              <button @click="openTraitementModal" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
                 + Ajouter
               </button>
+              <!-- Modal Traitement Varroa -->
+              <TraitementVarroaModal :is-open="isTraitementModalOpen" :registre-id="registreId"
+                @close="closeTraitementModal" @traitement-added="onTraitementAdded" />
             </div>
           </div>
           <div class="p-6">
@@ -239,7 +251,7 @@
                 class="py-2 border-b border-gray-100 last:border-b-0">
                 <p class="text-sm text-gray-900">{{ observation.contenu }}</p>
                 <p class="text-xs text-gray-500 mt-1">{{ formatDate(observation.date) }}</p>
-                <p class="text-xs text-gray-500 mt-1"> {{observation.content  }}</p>
+                <p class="text-xs text-gray-500 mt-1"> {{ observation.content }}</p>
               </div>
             </div>
             <div v-else class="text-center py-8 text-gray-500">
@@ -254,6 +266,43 @@
             </div>
           </div>
         </div>
+
+        <!-- Nourrissement -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium text-gray-900">Nourrissement</h3>
+              <button @click="openNourrissementModal" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+                + Ajouter
+              </button>
+              <!-- Modal Nourrissement -->
+              <NourrissementModal :is-open="isNourrissementModalOpen" :registre-id="registreId"
+                @close="closeNourrissementModal" @nourrissement-added="onNourrissementAdded" />
+            </div>
+          </div>
+          <div class="p-6">
+            <div v-if="registre.nourrissements?.length > 0" class="space-y-3">
+              <div v-for="nourrissement in registre.nourrissements.slice(-3)" :key="nourrissement.id"
+                class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                <div>
+                  <p class="text-sm text-gray-900">{{ nourrissement.quantite }} - {{ nourrissement.produit }}</p>
+                  <p class="text-xs text-gray-500">{{ formatDate(nourrissement.date) }}</p>
+                </div>
+              </div>
+              <button v-if="registre.nourrissements.length > 3" class="text-sm text-yellow-600 hover:text-yellow-700">
+                Voir tous ({{ registre.nourrissements.length }})
+              </button>
+            </div>
+            <div v-else class="text-center py-8 text-gray-500">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg>
+              <p class="text-sm">Aucun nourrissement enregistré</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -262,6 +311,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import ObservationModal from '~/components/ObservationModal.vue'
+import DeplacementModal from '~/components/DeplacementModal.vue'
+import RecolteModal from '~/components/RecolteModal.vue'
+import TraitementVarroaModal from '~/components/TraitementVarroaModal.vue'
+import NourrissementModal from '~/components/NourrissementModal.vue'
+
+
+
+// // OBSERVATION // // 
 
 // Après les autres ref()
 const isObservationModalOpen = ref(false)
@@ -278,6 +335,74 @@ function closeObservationModal() {
 async function onObservationAdded() {
   await chargerRegistre() // Recharge le registre pour afficher la nouvelle observation
 }
+
+
+
+// // DEPLACEMENT // // 
+
+const isDeplacementModalOpen = ref(false)
+
+function openDeplacementModal() {
+  isDeplacementModalOpen.value = true
+}
+
+function closeDeplacementModal() {
+  isDeplacementModalOpen.value = false
+}
+
+async function onDeplacementAdded() {
+  await chargerRegistre()
+}
+
+
+
+// // RECOLTE // // 
+const isRecolteModalOpen = ref(false)
+
+function openRecolteModal() {
+  isRecolteModalOpen.value = true
+}
+
+function closeRecolteModal() {
+  isRecolteModalOpen.value = false
+}
+
+async function onRecolteAdded() {
+  await chargerRegistre()
+}
+
+// TRAITEMENT // 
+const isTraitementModalOpen = ref(false)
+
+function openTraitementModal() {
+  isTraitementModalOpen.value = true
+}
+
+function closeTraitementModal() {
+  isTraitementModalOpen.value = false
+}
+
+async function onTraitementAdded() {
+  await chargerRegistre()
+}
+
+// NOURISEMENT // //
+
+// NOURRISSEMENT // 
+const isNourrissementModalOpen = ref(false)
+
+function openNourrissementModal() {
+  isNourrissementModalOpen.value = true
+}
+
+function closeNourrissementModal() {
+  isNourrissementModalOpen.value = false
+}
+
+async function onNourrissementAdded() {
+  await chargerRegistre()
+}
+
 
 definePageMeta({
   middleware: 'auth'

@@ -89,4 +89,72 @@ export class RegistresService {
     return await this.firestoreService.updateRegistre(id, data);
   }
 
+  // // DEPLACEMENNT // // 
+
+  async addDeplacement(registreId: string, deplacementData: { date: Date; nouvelleAdresse: string }) {
+    try {
+      const deplacement = {
+        id: Date.now().toString(),
+        ...deplacementData
+      };
+
+      await this.firestoreService.addDeplacementToRegistre(registreId, deplacement);
+
+      return deplacement;
+    } catch (error) {
+      throw new Error(`Error adding deplacement: ${error.message}`);
+    }
+  }
+
+  // // DEPLACEMENNT // // 
+
+  // // RECOLTE // // 
+
+  async addRecolte(registreId: string, recolteData: { date: Date; volume: number }) {
+    try {
+      const recolte = {
+        id: Date.now().toString(),
+        ...recolteData
+      };
+
+      await this.firestoreService.addRecolteToRegistre(registreId, recolte);
+
+      return recolte;
+    } catch (error) {
+      throw new Error(`Error adding recolte: ${error.message}`);
+    }
+  }
+
+  // // TRAITEMENT //
+  async addTraitementVarroa(registreId: string, traitementData: { date: Date; produit: string }) {
+    try {
+      const traitement = {
+        id: Date.now().toString(),
+        ...traitementData
+      };
+
+      await this.firestoreService.addTraitementVarroaToRegistre(registreId, traitement);
+
+      return traitement;
+    } catch (error) {
+      throw new Error(`Error adding traitement varroa: ${error.message}`);
+    }
+  }
+
+  // // NOURISSEMENT // // 
+
+  async addNourrissement(registreId: string, nourrissementData: { date: Date; quantite: number; produit: string }) {
+    try {
+      const nourrissement = {
+        id: Date.now().toString(),
+        ...nourrissementData
+      };
+
+      await this.firestoreService.addNourrissementToRegistre(registreId, nourrissement);
+
+      return nourrissement;
+    } catch (error) {
+      throw new Error(`Error adding nourrissement: ${error.message}`);
+    }
+  }
 }
