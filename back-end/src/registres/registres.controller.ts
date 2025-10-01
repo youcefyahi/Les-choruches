@@ -1,10 +1,18 @@
-import { Controller, Post, Get, Body, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Patch, Res } from '@nestjs/common';
 import { RegistresService } from './registres.service';
 import { RegistreElevage } from '../Models/RegistreElevage';
+import { ExportService } from './export.service';
+import type { Response } from 'express';
+
+
 
 @Controller('registres')
 export class RegistresController {
-  constructor(private registresService: RegistresService) { }
+  constructor(
+    private readonly registresService: RegistresService,
+    private readonly exportService: ExportService
+  ) { }
+
 
   @Post()
   async createRegistre(@Body() body: Omit<RegistreElevage, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -83,4 +91,37 @@ export class RegistresController {
     return await this.registresService.addMaladieTraitement(registreId, maladieTraitement);
   }
 
+  // // EXPORT TABLEUR // // 
+  @Get(':id/export')
+  async exportRegistre(
+    @Param('id') registreId: string,
+    @Res() res: Response
+  ) {
+    try {
+      // Récupérer le registre
+      const response = await this.registresService.getRegistre(registreId);
+
+      if (!response || !response.registre) {
+        return res.status(404).json({ message: 'Registre non trouvé' });
+      }
+
+      const registre = response.registre;
+
+      // Générer l'Excel
+      const buffer = this.exportService.exportRegistreToExcel(registre);
+      const fileName = this.exportService.generateFileName(registre);
+
+      // Envoyer le fichier
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+      res.send(buffer);
+
+    } catch (error) {
+      return res.status(500).json({ message: `Erreur lors de l'export: ${error.message}` });
+    }
+  }
+
 }
+
+
+
