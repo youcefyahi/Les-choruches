@@ -5,11 +5,13 @@ import { FirebaseModule } from './firebase.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RegistresModule } from './registres/registres.module';
+import { EntreprisesModule } from './entreprises/entreprises.module';
+
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule],
   controllers: [AppController],
   providers: [AppService],
   

@@ -19,6 +19,8 @@ import {
 // import { Observation } from '../Models/Observation';
 import { Apiculteur } from '../Models/Apiculteur';
 import { RegistreElevage } from '../Models/RegistreElevage';
+import { Entreprise } from '../Models/Entreprise';
+
 
 @Injectable()
 export class FirestoreService {
@@ -236,6 +238,57 @@ export class FirestoreService {
       maladiesTraitements,
       updatedAt: new Date()
     });
+  }
+
+  // Ajoutez ces méthodes dans la classe FirestoreService :
+
+  // Créer une entreprise
+  async createEntreprise(entreprise: Omit<Entreprise, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'entreprises'), {
+      ...entreprise,
+      employes: entreprise.employes || [],
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer toutes les entreprises
+  async getAllEntreprises(): Promise<Entreprise[]> {
+    const querySnapshot = await getDocs(collection(this.firestore, 'entreprises'));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as Entreprise));
+  }
+
+  // Récupérer une entreprise par ID
+  async getEntrepriseById(id: string): Promise<Entreprise | null> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) return null;
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as Entreprise;
+  }
+
+  // Mettre à jour une entreprise
+  async updateEntreprise(id: string, data: Partial<Entreprise>): Promise<void> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+
+  // Supprimer une entreprise
+  async deleteEntreprise(id: string): Promise<void> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    await deleteDoc(docRef);
   }
 
 }
