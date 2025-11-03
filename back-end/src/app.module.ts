@@ -6,12 +6,15 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RegistresModule } from './registres/registres.module';
 import { EntreprisesModule } from './entreprises/entreprises.module';
+import { AdminModule } from './admin/admin.module';
+import { RendezVousModule } from './rendez-vous/rendez-vous.module';
+
 
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule],
   controllers: [AppController],
   providers: [AppService],
   

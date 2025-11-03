@@ -20,6 +20,8 @@ import {
 import { Apiculteur } from '../Models/Apiculteur';
 import { RegistreElevage } from '../Models/RegistreElevage';
 import { Entreprise } from '../Models/Entreprise';
+import { Admin } from 'src/Models/Admin';
+import { RendezVous } from 'src/Models/RendezVous';
 
 
 @Injectable()
@@ -290,5 +292,75 @@ export class FirestoreService {
     const docRef = doc(this.firestore, 'entreprises', id);
     await deleteDoc(docRef);
   }
+
+  async createAdmin(admin: Omit<Admin, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'admins'), {
+      ...admin,
+      role: 'admin',
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer un admin par email
+  async getAdminByEmail(email: string): Promise<Admin | null> {
+    const q = query(collection(this.firestore, 'admins'), where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) return null;
+
+    const doc = querySnapshot.docs[0];
+    return {
+      id: doc.id,
+      ...doc.data(),
+    } as Admin;
+  }
+  async createRendezVous(rdv: Omit<RendezVous, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'rendez_vous'), {
+      ...rdv,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer les RDV d'un apiculteur
+  async getRendezVousByApiculteur(apiculteurId: string): Promise<RendezVous[]> {
+    const q = query(
+      collection(this.firestore, 'rendez_vous'),
+      where('apiculteurId', '==', apiculteurId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RendezVous));
+  }
+
+  // Récupérer les RDV d'une entreprise
+  async getRendezVousByEntreprise(entrepriseId: string): Promise<RendezVous[]> {
+    const q = query(
+      collection(this.firestore, 'rendez_vous'),
+      where('entrepriseId', '==', entrepriseId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RendezVous));
+  }
+
+  // Mettre à jour un rendez-vous
+  async updateRendezVous(id: string, data: Partial<RendezVous>): Promise<void> {
+    const docRef = doc(this.firestore, 'rendez_vous', id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+
 
 }
