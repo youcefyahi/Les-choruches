@@ -1,13 +1,77 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { ActionsSaisonnieresService } from './actions-saisonnieres.service';
 import type { CreateActionSaisonniere } from '../Models/actions-saisonnieres/CreateActionSaisonniere';
-import type  { UpdateActionSaisonniere } from '../Models/actions-saisonnieres/UpdateActionSaisonniere';
+import type { UpdateActionSaisonniere } from '../Models/actions-saisonnieres/UpdateActionSaisonniere';
 
 @Controller('actions-saisonnieres')
 export class ActionsSaisonnieresController {
-  constructor(private readonly actionsSaisonnieresService: ActionsSaisonnieresService) {}
+  constructor(private readonly actionsSaisonnieresService: ActionsSaisonnieresService) { }
 
   // Créer une nouvelle action saisonnière
+
+
+  @Post('generate-standard/:apiculteurId')
+  async generateStandardActions(@Param('apiculteurId') apiculteurId: string) {
+    try {
+      // Typer explicitement comme CreateActionSaisonniere[]
+      const standardActions: CreateActionSaisonniere[] = [
+        {
+          titre: "Visite de printemps",
+          description: "Première visite de l'année pour évaluer l'état des colonies",
+          saison: "printemps",
+          moisOptimal: 3,
+          priorite: "haute",
+          frequence: "unique",
+          apiculteurId
+        },
+        {
+          titre: "Pose des hausses",
+          description: "Installation des hausses pour la récolte",
+          saison: "printemps",
+          moisOptimal: 4,
+          priorite: "haute",
+          frequence: "unique",
+          apiculteurId
+        },
+        {
+          titre: "Récolte de miel",
+          description: "Récolte du miel de printemps/été",
+          saison: "ete",
+          moisOptimal: 7,
+          priorite: "haute",
+          frequence: "unique",
+          apiculteurId
+        },
+        {
+          titre: "Traitement varroa",
+          description: "Traitement contre le varroa destructor",
+          saison: "automne",
+          moisOptimal: 9,
+          priorite: "haute",
+          frequence: "unique",
+          apiculteurId
+        },
+        {
+          titre: "Préparation hivernage",
+          description: "Préparation des ruches pour l'hiver",
+          saison: "hiver",
+          moisOptimal: 11,
+          priorite: "haute",
+          frequence: "unique",
+          apiculteurId
+        }
+      ];
+
+      for (const action of standardActions) {
+        await this.actionsSaisonnieresService.createAction(action);
+      }
+
+      return { success: true, message: 'Actions standard générées' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
   @Post()
   async createAction(@Body() actionData: CreateActionSaisonniere) {
     try {
