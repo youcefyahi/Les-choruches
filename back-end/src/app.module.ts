@@ -8,13 +8,16 @@ import { RegistresModule } from './registres/registres.module';
 import { EntreprisesModule } from './entreprises/entreprises.module';
 import { AdminModule } from './admin/admin.module';
 import { RendezVousModule } from './rendez-vous/rendez-vous.module';
+import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
+
+
 
 
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule],
   controllers: [AppController],
   providers: [AppService],
   
