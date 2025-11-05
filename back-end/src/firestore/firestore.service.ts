@@ -19,6 +19,10 @@ import {
 // import { Observation } from '../Models/Observation';
 import { Apiculteur } from '../Models/Apiculteur';
 import { RegistreElevage } from '../Models/RegistreElevage';
+import { Entreprise } from '../Models/Entreprise';
+import { Admin } from 'src/Models/Admin';
+import { RendezVous } from 'src/Models/RendezVous';
+
 
 @Injectable()
 export class FirestoreService {
@@ -237,5 +241,126 @@ export class FirestoreService {
       updatedAt: new Date()
     });
   }
+
+  // Ajoutez ces méthodes dans la classe FirestoreService :
+
+  // Créer une entreprise
+  async createEntreprise(entreprise: Omit<Entreprise, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'entreprises'), {
+      ...entreprise,
+      employes: entreprise.employes || [],
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer toutes les entreprises
+  async getAllEntreprises(): Promise<Entreprise[]> {
+    const querySnapshot = await getDocs(collection(this.firestore, 'entreprises'));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as Entreprise));
+  }
+
+  // Récupérer une entreprise par ID
+  async getEntrepriseById(id: string): Promise<Entreprise | null> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) return null;
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as Entreprise;
+  }
+
+  // Mettre à jour une entreprise
+  async updateEntreprise(id: string, data: Partial<Entreprise>): Promise<void> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+
+  // Supprimer une entreprise
+  async deleteEntreprise(id: string): Promise<void> {
+    const docRef = doc(this.firestore, 'entreprises', id);
+    await deleteDoc(docRef);
+  }
+
+  async createAdmin(admin: Omit<Admin, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'admins'), {
+      ...admin,
+      role: 'admin',
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer un admin par email
+  async getAdminByEmail(email: string): Promise<Admin | null> {
+    const q = query(collection(this.firestore, 'admins'), where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) return null;
+
+    const doc = querySnapshot.docs[0];
+    return {
+      id: doc.id,
+      ...doc.data(),
+    } as Admin;
+  }
+  async createRendezVous(rdv: Omit<RendezVous, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const now = new Date();
+    const docRef = await addDoc(collection(this.firestore, 'rendez_vous'), {
+      ...rdv,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return docRef.id;
+  }
+
+  // Récupérer les RDV d'un apiculteur
+  async getRendezVousByApiculteur(apiculteurId: string): Promise<RendezVous[]> {
+    const q = query(
+      collection(this.firestore, 'rendez_vous'),
+      where('apiculteurId', '==', apiculteurId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RendezVous));
+  }
+
+  // Récupérer les RDV d'une entreprise
+  async getRendezVousByEntreprise(entrepriseId: string): Promise<RendezVous[]> {
+    const q = query(
+      collection(this.firestore, 'rendez_vous'),
+      where('entrepriseId', '==', entrepriseId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RendezVous));
+  }
+
+  // Mettre à jour un rendez-vous
+  async updateRendezVous(id: string, data: Partial<RendezVous>): Promise<void> {
+    const docRef = doc(this.firestore, 'rendez_vous', id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+
 
 }
