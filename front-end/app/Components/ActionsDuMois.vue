@@ -3,17 +3,34 @@
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-semibold text-gray-900 flex items-center">
         <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         Actions du mois
       </h3>
-      <button 
-        @click="$emit('open-modal')" 
-        class="text-sm text-blue-600 hover:text-blue-800 font-medium"
-      >
+      <button @click="$emit('open-modal')" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
         Voir le calendrier annuel
       </button>
+    </div>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Actions du mois
+      </h3>
+
+      <!-- LES DEUX BOUTONS CÔTE À CÔTE -->
+      <div class="flex space-x-3">
+        <button @click="$emit('open-modal')" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+          Voir le calendrier annuel
+        </button>
+        <button @click="$emit('open-guide-photos')"
+          class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center">
+          📸 Guide Photos
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -24,19 +41,11 @@
 
     <!-- Actions du mois -->
     <div v-else-if="actions.length > 0" class="space-y-3">
-      <div 
-        v-for="action in actions" 
-        :key="action.id"
-        class="flex items-center justify-between p-3 rounded-lg border-l-4"
-        :class="getPriorityClass(action.priorite)"
-      >
+      <div v-for="action in actions" :key="action.id"
+        class="flex items-center justify-between p-3 rounded-lg border-l-4" :class="getPriorityClass(action.priorite)">
         <div class="flex items-center space-x-3">
-          <input 
-            type="checkbox" 
-            :checked="action.status === 'terminee'"
-            @change="toggleActionStatus(action)"
-            class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-          />
+          <input type="checkbox" :checked="action.status === 'terminee'" @change="toggleActionStatus(action)"
+            class="w-4 h-4 text-green-600 rounded focus:ring-green-500" />
           <div>
             <h4 class="font-medium text-gray-900">{{ action.titre }}</h4>
             <p class="text-sm text-gray-600">{{ action.description }}</p>
@@ -50,11 +59,8 @@
             </div>
           </div>
         </div>
-        
-        <span 
-          class="px-2 py-1 text-xs rounded-full"
-          :class="getStatusClass(action.status)"
-        >
+
+        <span class="px-2 py-1 text-xs rounded-full" :class="getStatusClass(action.status)">
           {{ getStatusLabel(action.status) }}
         </span>
       </div>
@@ -63,8 +69,9 @@
     <!-- Aucune action -->
     <div v-else class="text-center py-6">
       <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+        </path>
       </svg>
       <p class="text-gray-500">Aucune action prévue ce mois-ci</p>
     </div>
@@ -83,7 +90,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['open-modal', 'action-updated'])
+const emit = defineEmits(['open-modal', 'action-updated', 'open-guide-photos'])
 
 // Couleurs selon la priorité
 function getPriorityClass(priorite) {

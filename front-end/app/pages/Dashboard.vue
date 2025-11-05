@@ -23,15 +23,17 @@
           Gérez votre rucher en toute simplicité.
         </p>
       </div>
+      
       <!-- Actions du mois -->
-      <ActionsDuMois :actions="actionsCurrentMonth" :loading="loadingActions" @open-modal="openSaisonModal"
-        @action-updated="updateActionStatus" />
-
-      <ActionsSaisonnieresModal :is-open="isModalOpen" @close="closeModal" @actions-updated="loadActionsCurrentMonth" />
-
+      <ActionsDuMois 
+        :actions="actionsCurrentMonth" 
+        :loading="loadingActions" 
+        @open-modal="openSaisonModal"
+        @action-updated="updateActionStatus"
+        @open-guide-photos="openGuidePhotos"
+      />
 
       <!-- Modules -->
-
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Module 1: Registres -->
         <div @click="allerAuxRegistres"
@@ -99,6 +101,20 @@
         </div>
       </div>
     </main>
+
+    <!-- Modale des actions saisonnières -->
+    <ActionsSaisonnieresModal 
+      :is-open="isModalOpen" 
+      @close="closeModal" 
+      @actions-updated="loadActionsCurrentMonth" 
+    />
+
+    <!-- Modale Guide Photos -->
+    <GuidePhotosModal 
+      :is-open="isGuidePhotosOpen" 
+      :action-titre="'Guide Général'"
+      @close="closeGuidePhotos" 
+    />
   </div>
 </template>
 
@@ -117,8 +133,9 @@ const user = ref(null)
 const actionsCurrentMonth = ref([])
 const loadingActions = ref(false)
 
-// Donnée pour la modale
+// Données pour les modales
 const isModalOpen = ref(false)
+const isGuidePhotosOpen = ref(false)
 
 // Charger les données utilisateur et actions
 onMounted(async () => {
@@ -165,13 +182,22 @@ async function loadActionsCurrentMonth() {
   }
 }
 
-// Fonctions modale
+// Fonctions modale actions saisonnières
 function openSaisonModal() {
   isModalOpen.value = true
 }
 
 function closeModal() {
   isModalOpen.value = false
+}
+
+// Fonctions modale guide photos
+function openGuidePhotos() {
+  isGuidePhotosOpen.value = true
+}
+
+function closeGuidePhotos() {
+  isGuidePhotosOpen.value = false
 }
 
 // Mettre à jour le statut d'une action
