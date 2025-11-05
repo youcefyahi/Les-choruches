@@ -9,6 +9,8 @@ import { EntreprisesModule } from './entreprises/entreprises.module';
 import { AdminModule } from './admin/admin.module';
 import { RendezVousModule } from './rendez-vous/rendez-vous.module';
 import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
+import { ActionsSaisonnieresModule } from './actions-saisonnieres/actions-saisonnieres.module';
+
 
 
 
@@ -17,7 +19,7 @@ import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule],
   controllers: [AppController],
   providers: [AppService],
   
