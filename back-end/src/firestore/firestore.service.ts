@@ -363,4 +363,9 @@ export class FirestoreService {
   }
 
 
+  getFirestore(): Firestore {
+  return this.firestore;
+}
+
+
 }

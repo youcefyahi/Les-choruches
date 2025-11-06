@@ -24,8 +24,14 @@
         </p>
       </div>
 
-      <!-- Modules -->
+      <!-- Actions du mois -->
+      <ActionsDuMois :actions="actionsCurrentMonth" :loading="loadingActions" @open-modal="openSaisonModal"
+        @action-updated="updateActionStatus" @open-guide-photos="openGuidePhotos" />
 
+      <CahierChargesCard @open-cahier-charges="openCahierCharges" />
+
+
+      <!-- Modules -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Module 1: Registres -->
         <div @click="allerAuxRegistres"
@@ -93,6 +99,12 @@
         </div>
       </div>
     </main>
+
+    <!-- Modale des actions saisonnières -->
+    <ActionsSaisonnieresModal :is-open="isModalOpen" @close="closeModal" @actions-updated="loadActionsCurrentMonth" />
+
+    <!-- Modale Guide Photos -->
+    <GuidePhotosModal :is-open="isGuidePhotosOpen" :action-titre="'Guide Général'" @close="closeGuidePhotos" />
   </div>
 </template>
 
@@ -107,17 +119,31 @@ definePageMeta({
 // Données utilisateur
 const user = ref(null)
 
-function goToEntreprises() {
-  navigateTo('/entreprises')
-}
+// Données pour les actions
+const actionsCurrentMonth = ref([])
+const loadingActions = ref(false)
 
-// Charger les données utilisateur
-onMounted(() => {
+// Données pour les modales
+const isModalOpen = ref(false)
+const isGuidePhotosOpen = ref(false)
+
+// Charger les données utilisateur et actions
+onMounted(async () => {
   const userData = localStorage.getItem('user')
   if (userData) {
     user.value = JSON.parse(userData)
   }
+  await loadActionsCurrentMonth()
 })
+
+// Navigation
+function goToEntreprises() {
+  navigateTo('/entreprises')
+}
+
+function allerAuxRegistres() {
+  navigateTo('/registres')
+}
 
 // Déconnexion
 function logout() {
@@ -126,8 +152,58 @@ function logout() {
   navigateTo('/login')
 }
 
-// Navigation vers les registres
-function allerAuxRegistres() {
-  navigateTo('/registres')
+// Charger les actions du mois
+async function loadActionsCurrentMonth() {
+  try {
+    loadingActions.value = true
+    const userData = localStorage.getItem('user')
+    if (!userData) return
+
+    const user = JSON.parse(userData)
+    const response = await $fetch(`http://localhost:3001/actions-saisonnieres/apiculteur/${user.id}/current-month`)
+
+    if (response.success) {
+      actionsCurrentMonth.value = response.actions
+    }
+  } catch (error) {
+    console.error('Erreur chargement actions:', error)
+  } finally {
+    loadingActions.value = false
+  }
+}
+
+// Fonctions modale actions saisonnières
+function openSaisonModal() {
+  isModalOpen.value = true
+}
+
+function closeModal() {
+  isModalOpen.value = false
+}
+
+// Fonctions modale guide photos
+function openGuidePhotos() {
+  isGuidePhotosOpen.value = true
+}
+
+function closeGuidePhotos() {
+  isGuidePhotosOpen.value = false
+}
+
+// Mettre à jour le statut d'une action
+async function updateActionStatus({ actionId, status }) {
+  try {
+    const response = await $fetch(`http://localhost:3001/actions-saisonnieres/${actionId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: { status }
+    })
+
+    if (response.success) {
+      await loadActionsCurrentMonth()
+    }
+  } catch (error) {
+    console.error('Erreur mise à jour action:', error)
+  }
 }
 </script>
