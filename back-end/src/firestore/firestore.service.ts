@@ -22,6 +22,7 @@ import { RegistreElevage } from '../Models/RegistreElevage';
 import { Entreprise } from '../Models/Entreprise';
 import { Admin } from 'src/Models/Admin';
 import { RendezVous } from 'src/Models/RendezVous';
+import { CompteRendu } from '../Models/CompteRendu';
 
 
 @Injectable()
@@ -364,8 +365,48 @@ export class FirestoreService {
 
 
   getFirestore(): Firestore {
-  return this.firestore;
-}
+    return this.firestore;
+  }
+  // Ajouter ces méthodes à la fin de la classe FirestoreService
 
+  async createCompteRendu(compteRendu: Omit<CompteRendu, 'id'>): Promise<string> {
+    const docRef = await addDoc(collection(this.firestore, 'comptes_rendus'), compteRendu);
+    return docRef.id;
+  }
+
+  async getComptesRendusByApiculteur(apiculteurId: string): Promise<CompteRendu[]> {
+    const q = query(
+      collection(this.firestore, 'comptes_rendus'),
+      where('apiculteur_id', '==', apiculteurId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as CompteRendu));
+  }
+
+  async getCompteRenduById(id: string): Promise<CompteRendu | null> {
+    const docRef = doc(this.firestore, 'comptes_rendus', id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) return null;
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as CompteRendu;
+  }
+
+  async updateCompteRendu(id: string, data: Partial<CompteRendu>): Promise<void> {
+    const docRef = doc(this.firestore, 'comptes_rendus', id);
+    await updateDoc(docRef, data);
+  }
+
+  async deleteCompteRendu(id: string): Promise<void> {
+    const docRef = doc(this.firestore, 'comptes_rendus', id);
+    await deleteDoc(docRef);
+  }
 
 }
