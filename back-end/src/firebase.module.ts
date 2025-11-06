@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import * as admin from 'firebase-admin'; // ← Ajouter
 
 @Global()
 @Module({
@@ -38,17 +39,25 @@ import { getAuth } from 'firebase/auth';
         };
 
         const app = initializeApp(firebaseConfig);
-        console.log('API Key:', configService.get('FIREBASE_API_KEY'));
-        console.log('Project ID:', configService.get('FIREBASE_PROJECT_ID'));
-
         return getAuth(app);
       },
       inject: [ConfigService],
     },
-
+    // ← AJOUTER Firebase Admin
+    {
+      provide: 'FIREBASE_ADMIN',
+      useFactory: (configService: ConfigService) => {
+        if (!admin.apps.length) {
+          admin.initializeApp({
+            projectId: configService.get('FIREBASE_PROJECT_ID'),
+            // Pour la production, ajoute le service account ici
+          });
+        }
+        return admin;
+      },
+      inject: [ConfigService],
+    },
   ],
-  exports: ['FIRESTORE', 'FIREBASE_AUTH'],
+  exports: ['FIRESTORE', 'FIREBASE_AUTH', 'FIREBASE_ADMIN'], // ← Exporter
 })
-
-
-export class FirebaseModule { }
+export class FirebaseModule {}
