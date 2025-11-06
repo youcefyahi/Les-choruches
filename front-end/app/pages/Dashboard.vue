@@ -23,15 +23,13 @@
           Gérez votre rucher en toute simplicité.
         </p>
       </div>
-      
+
       <!-- Actions du mois -->
-      <ActionsDuMois 
-        :actions="actionsCurrentMonth" 
-        :loading="loadingActions" 
-        @open-modal="openSaisonModal"
-        @action-updated="updateActionStatus"
-        @open-guide-photos="openGuidePhotos"
-      />
+      <ActionsDuMois :actions="actionsCurrentMonth" :loading="loadingActions" @open-modal="openSaisonModal"
+        @action-updated="updateActionStatus" @open-guide-photos="openGuidePhotos" />
+
+      <CahierChargesCard @open-cahier-charges="openCahierCharges" />
+
 
       <!-- Modules -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -103,18 +101,10 @@
     </main>
 
     <!-- Modale des actions saisonnières -->
-    <ActionsSaisonnieresModal 
-      :is-open="isModalOpen" 
-      @close="closeModal" 
-      @actions-updated="loadActionsCurrentMonth" 
-    />
+    <ActionsSaisonnieresModal :is-open="isModalOpen" @close="closeModal" @actions-updated="loadActionsCurrentMonth" />
 
     <!-- Modale Guide Photos -->
-    <GuidePhotosModal 
-      :is-open="isGuidePhotosOpen" 
-      :action-titre="'Guide Général'"
-      @close="closeGuidePhotos" 
-    />
+    <GuidePhotosModal :is-open="isGuidePhotosOpen" :action-titre="'Guide Général'" @close="closeGuidePhotos" />
   </div>
 </template>
 
