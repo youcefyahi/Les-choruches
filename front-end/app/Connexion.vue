@@ -74,11 +74,14 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import type { LoginCredentials } from '~/types'
 
-// Données du formulaire
-const form = ref({
+// ✅ NOUVEAU : Utilise le composable
+const { login } = useAuth()
+
+// ✅ Données du formulaire typées
+const form = ref<LoginCredentials>({
   email: '',
   password: ''
 })
@@ -88,43 +91,20 @@ const loading = ref(false)
 const error = ref('')
 const success = ref('')
 
-// Fonction de connexion
+// ✅ NOUVEAU : Fonction de connexion simplifiée
 async function handleSubmit() {
   loading.value = true
   error.value = ''
   success.value = ''
 
   try {
-    const response = await $fetch('http://localhost:3001/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        email: form.value.email,
-        password: form.value.password
-      }
-    })
-
+    // ✅ Utilise le composable - plus de $fetch manuel !
+    await login(form.value)
+    
     success.value = 'Connexion réussie !'
-    console.log('Réponse:', response)
-
-    // ← AJOUTER CES LIGNES CRITIQUES :
-    const user = useState('user')
-    user.value = {
-      id: response.uid,           // ← UID Firebase
-      email: response.email,
-      ...response.apiculteur      // ← Données Firestore en plus
-    }
-
-
-    // Sauvegarder aussi dans localStorage (optionnel)
-    localStorage.setItem('token', response.token)
-    localStorage.setItem('user', JSON.stringify(response.apiculteur))
-
-    // Redirection vers dashboard
+    
     setTimeout(() => {
-      navigateTo('/dashboard') // ← Attention : /dashboard (pas /Dashboard)
+      navigateTo('/dashboard')
     }, 1000)
 
   } catch (err) {

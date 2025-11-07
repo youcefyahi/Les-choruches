@@ -26,7 +26,9 @@
 </template>
 
 <script setup>
-const user = useState('user')
+// ✅ CORRIGÉ : Ajouter 'user' dans la destructuration
+const { user, getUserId, getToken } = useAuth()
+
 const comptesRendus = ref([])
 const loading = ref(true)
 const isModalOpen = ref(false)
@@ -35,10 +37,17 @@ const selectedCompteRendu = ref(null)
 const loadComptesRendus = async () => {
     loading.value = true
     try {
-        console.log('🔍 Debug user.value.id:', user.value.id); // ← LOG DE DEBUG
+        const userId = getUserId()
+        const token = getToken()
 
-        const token = localStorage.getItem('token')
-        const response = await $fetch(`http://localhost:3001/comptes-rendus/apiculteur/${user.value.id}`, {
+        // ✅ Debug complet
+        console.log('🔍 Debug state:', {
+            user: user.value,
+            userId: userId,
+            token: token
+        })
+
+        const response = await $fetch(`http://localhost:3001/comptes-rendus/apiculteur/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -67,23 +76,24 @@ const closeModal = () => {
 
 const saveCompteRendu = async (data) => {
     try {
-        const token = localStorage.getItem('token') // ← AJOUTER
+        const token = getToken()
 
         if (selectedCompteRendu.value) {
             await $fetch(`http://localhost:3001/comptes-rendus/${selectedCompteRendu.value.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}` // ← AJOUTER
+                    'Authorization': `Bearer ${token}`
                 },
                 body: data
             })
         } else {
+            const userId = getUserId()
             await $fetch('http://localhost:3001/comptes-rendus', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}` // ← AJOUTER
+                    'Authorization': `Bearer ${token}`
                 },
-                body: { ...data, apiculteur_id: user.value.id }
+                body: { ...data, apiculteur_id: userId }
             })
         }
         await loadComptesRendus()
@@ -93,15 +103,14 @@ const saveCompteRendu = async (data) => {
     }
 }
 
-
 const deleteCompteRendu = async (id) => {
     if (confirm('Supprimer ce compte rendu ?')) {
         try {
-            const token = localStorage.getItem('token') // ← AJOUTER
+            const token = getToken()
             await $fetch(`http://localhost:3001/comptes-rendus/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}` // ← AJOUTER
+                    'Authorization': `Bearer ${token}`
                 }
             })
             await loadComptesRendus()
