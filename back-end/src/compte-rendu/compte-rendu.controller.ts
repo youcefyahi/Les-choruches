@@ -5,7 +5,7 @@ import { AuthGuard } from '../auth/auth.guard';
 @Controller('comptes-rendus')
 @UseGuards(AuthGuard)
 export class CompteRenduController {
-  constructor(private compteRenduService: CompteRenduService) {}
+  constructor(private compteRenduService: CompteRenduService) { }
 
   @Post()
   async create(@Body() data: any, @Request() req) {
@@ -19,6 +19,13 @@ export class CompteRenduController {
 
   @Get('apiculteur/:apiculteurId')
   async getByApiculteur(@Param('apiculteurId') apiculteurId: string, @Request() req) {
+    // ← AJOUTER CES LOGS
+    console.log('🆔 CompteRendu - Comparaison:', {
+      url_param: apiculteurId,
+      token_user: req.user.id,
+      sont_egaux: apiculteurId === req.user.id
+    });
+
     if (apiculteurId !== req.user.id) {
       throw new Error('Accès interdit');
     }
@@ -29,12 +36,12 @@ export class CompteRenduController {
   @Get(':id')
   async getById(@Param('id') id: string, @Request() req) {
     const compte_rendu = await this.compteRenduService.getById(id);
-    
+
     // ← VÉRIFICATION NULL
     if (!compte_rendu) {
       throw new NotFoundException('Compte rendu introuvable');
     }
-    
+
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
@@ -44,12 +51,12 @@ export class CompteRenduController {
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: any, @Request() req) {
     const compte_rendu = await this.compteRenduService.getById(id);
-    
+
     // ← VÉRIFICATION NULL
     if (!compte_rendu) {
       throw new NotFoundException('Compte rendu introuvable');
     }
-    
+
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
@@ -60,12 +67,12 @@ export class CompteRenduController {
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req) {
     const compte_rendu = await this.compteRenduService.getById(id);
-    
+
     // ← VÉRIFICATION NULL
     if (!compte_rendu) {
       throw new NotFoundException('Compte rendu introuvable');
     }
-    
+
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
