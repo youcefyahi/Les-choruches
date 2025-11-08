@@ -18,14 +18,9 @@
               Email
             </label>
             <div class="mt-1">
-              <input
-                id="email"
-                v-model="form.email"
-                type="email"
-                required
+              <input id="email" v-model="form.email" type="email" required
                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="votre@email.com"
-              />
+                placeholder="votre@email.com" />
             </div>
           </div>
 
@@ -35,14 +30,9 @@
               Mot de passe
             </label>
             <div class="mt-1">
-              <input
-                id="password"
-                v-model="form.password"
-                type="password"
-                required
+              <input id="password" v-model="form.password" type="password" required
                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Votre mot de passe"
-              />
+                placeholder="Votre mot de passe" />
             </div>
           </div>
 
@@ -58,11 +48,8 @@
 
           <!-- Bouton -->
           <div>
-            <button
-              type="submit"
-              :disabled="loading"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
+            <button type="submit" :disabled="loading"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
               <span v-if="loading">Connexion en cours...</span>
               <span v-else>Se connecter</span>
             </button>
@@ -87,11 +74,14 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import type { LoginCredentials } from '~/types'
 
-// Données du formulaire
-const form = ref({
+// ✅ NOUVEAU : Utilise le composable
+const { login } = useAuth()
+
+// ✅ Données du formulaire typées
+const form = ref<LoginCredentials>({
   email: '',
   password: ''
 })
@@ -101,34 +91,20 @@ const loading = ref(false)
 const error = ref('')
 const success = ref('')
 
-// Fonction de connexion
+// ✅ NOUVEAU : Fonction de connexion simplifiée
 async function handleSubmit() {
   loading.value = true
   error.value = ''
   success.value = ''
 
   try {
-    const response = await $fetch('http://localhost:3001/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        email: form.value.email,
-        password: form.value.password
-      }
-    })
-
-    success.value = 'Connexion réussie !'
-    console.log('Réponse:', response)
+    // ✅ Utilise le composable - plus de $fetch manuel !
+    await login(form.value)
     
-    // Sauvegarder le token (localStorage pour l'instant)
-    localStorage.setItem('token', response.token)
-    localStorage.setItem('user', JSON.stringify(response.apiculteur))
-
-    // Redirection vers dashboard (à créer)
+    success.value = 'Connexion réussie !'
+    
     setTimeout(() => {
-      navigateTo('/Dashboard')
+      navigateTo('/dashboard')
     }, 1000)
 
   } catch (err) {
