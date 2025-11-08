@@ -26,4 +26,8 @@ export interface CompteRendu {
   
   created_at: Date;
   updated_at: Date;
+
+  // ✅ AJOUTS pour le système de stockage temporaire
+  is_temporary?: boolean;        // true = temporaire, false/undefined = permanent
+  expires_at?: Date;            // Date d'expiration (created_at + 2 jours)
 }

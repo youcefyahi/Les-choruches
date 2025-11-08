@@ -15,13 +15,6 @@ import { CompteRenduModule } from './compte-rendu/compte-rendu.module';
 
 
 
-
-
-
-
-
-
-
 @Module({
   imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule],
   controllers: [AppController],
