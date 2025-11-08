@@ -13,12 +13,14 @@ import { ActionsSaisonnieresModule } from './actions-saisonnieres/actions-saison
 import { PhotoSuggestionsModule } from './photo-suggestions/photo-suggestions.module';
 import { CompteRenduModule } from './compte-rendu/compte-rendu.module';
 import { AIModule } from './ai/ai.module';
+import { UploadModule } from './upload/upload.module';
+
 
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule,AIModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule,AIModule,UploadModule],
   controllers: [AppController],
   providers: [AppService],
   
