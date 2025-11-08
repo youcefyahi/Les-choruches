@@ -409,4 +409,41 @@ export class FirestoreService {
     await deleteDoc(docRef);
   }
 
+  async deleteTemporaryComptesRendus(twoDaysAgo: Date) {
+    try {
+      console.log('🔍 Recherche des comptes rendus temporaires à supprimer...');
+
+      const q = query(
+        collection(this.firestore, 'comptes_rendus'),
+        where('is_temporary', '==', true),
+        where('created_at', '<', twoDaysAgo)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log('✅ Aucun compte rendu temporaire à supprimer');
+        return;
+      }
+
+      console.log(`🗑️ ${querySnapshot.size} comptes rendus temporaires à supprimer`);
+
+      // ✅ SUPPRIMER COMPTES RENDUS + PHOTOS
+      for (const docSnap of querySnapshot.docs) {
+        await deleteDoc(docSnap.ref);
+        console.log(`Supprimé compte rendu + photos: ${docSnap.id}`);
+      }
+
+      console.log('✅ Comptes rendus et photos temporaires supprimés');
+
+    } catch (error) {
+      console.error('❌ Erreur:', error);
+      throw error;
+    }
+  }
+
+
+
+
+
 }
