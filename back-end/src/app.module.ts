@@ -12,11 +12,13 @@ import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { ActionsSaisonnieresModule } from './actions-saisonnieres/actions-saisonnieres.module';
 import { PhotoSuggestionsModule } from './photo-suggestions/photo-suggestions.module';
 import { CompteRenduModule } from './compte-rendu/compte-rendu.module';
+import { AIModule } from './ai/ai.module';
+
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule],
+  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule,AIModule],
   controllers: [AppController],
   providers: [AppService],
   
