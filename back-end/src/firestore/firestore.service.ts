@@ -296,8 +296,14 @@ export class FirestoreService {
 
   async createAdmin(admin: Omit<Admin, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const now = new Date();
+
+    // ✅ CORRECTION : Filtrer les undefined
+    const cleanAdmin = Object.fromEntries(
+      Object.entries(admin).filter(([_, value]) => value !== undefined)
+    );
+
     const docRef = await addDoc(collection(this.firestore, 'admins'), {
-      ...admin,
+      ...cleanAdmin,
       role: 'admin',
       createdAt: now,
       updatedAt: now,

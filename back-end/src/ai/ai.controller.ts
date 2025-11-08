@@ -1,4 +1,3 @@
-// src/ai/ai.controller.ts
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AIService } from './ai.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -9,7 +8,8 @@ export class AIController {
   constructor(private aiService: AIService) {}
 
   @Post('enhance-compte-rendu')
-  async enhanceCompteRendu(@Body() body: { compteRenduId: string }) {
-    return await this.aiService.enhanceCompteRendu(body.compteRenduId);
+  async enhanceCompteRendu(@Body() body: { compteRendu: any }) {
+    const enhancedText = await this.aiService.enhanceCompteRendu(body.compteRendu);
+    return { enhancedText };
   }
 }
