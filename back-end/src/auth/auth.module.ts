@@ -7,8 +7,8 @@ import { AdminGuard } from './admin.guard';
 
 
 @Module({
-  controllers: [AuthController,AdminGuard],
-  providers: [AuthService, AuthGuard, FirestoreService], // ← Ajouter AuthGuard
+  controllers: [AuthController],
+  providers: [AuthService, AuthGuard, FirestoreService,AdminGuard], // ← Ajouter AuthGuard
   exports: [AuthService, AuthGuard,AdminGuard], // ← Exporter AuthGuard
 })
 export class AuthModule {}

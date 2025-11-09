@@ -448,6 +448,23 @@ export class FirestoreService {
     }
   }
 
+  async getComptesRendusByStatut(statut: string): Promise<CompteRendu[]> {
+    const { collection, query, where, orderBy, getDocs } = await import('firebase/firestore');
+
+    const comptesRendusRef = collection(this.firestore, 'comptes-rendus');
+    const q = query(
+      comptesRendusRef,
+      where('statut', '==', statut),
+      orderBy('created_at', 'desc')
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as CompteRendu));
+  }
+
 
 
 
