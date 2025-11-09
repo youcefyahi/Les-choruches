@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { FirestoreService } from '../firestore/firestore.service';
 import { CompteRendu } from '../Models/CompteRendu';
+import { LinkedInService } from '../linkedin/linkedin.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class CompteRenduService {
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private firestoreService: FirestoreService,
+    private linkedInService: LinkedInService,
+    private emailService: EmailService,
+  ) {}
 
   async create(data: Omit<CompteRendu, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
     const now = new Date();
@@ -73,11 +79,30 @@ export class CompteRenduService {
       throw new Error("Ce compte rendu n'est pas en attente de validation");
     }
 
+    // 1. Mettre à jour le statut dans Firestore
     await this.firestoreService.updateCompteRendu(id, {
       statut: 'validé',
       date_validation: new Date(),
       validé_par: adminId,
     });
+
+    console.log('📢 Compte rendu validé, publication LinkedIn + Email...');
+
+    // 2. Publier sur LinkedIn
+    try {
+      await this.linkedInService.postToLinkedIn(compteRendu);
+    } catch (error) {
+      console.error('❌ Erreur publication LinkedIn:', error);
+      // On continue même si LinkedIn échoue
+    }
+
+    // 3. Envoyer l'email
+    try {
+      await this.emailService.sendValidationEmail(compteRendu);
+    } catch (error) {
+      console.error('❌ Erreur envoi email:', error);
+      // On continue même si l'email échoue
+    }
   }
 
   async rejeterCompteRendu(id: string, adminId: string, motif: string): Promise<void> {

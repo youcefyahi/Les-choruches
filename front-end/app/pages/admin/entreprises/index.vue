@@ -59,14 +59,13 @@
       <!-- Liste des entreprises -->
       <div v-else class="bg-white shadow overflow-hidden sm:rounded-lg">
         <ul class="divide-y divide-gray-200">
-          <li v-for="entreprise in entreprises" :key="entreprise.id"
-            class="hover:bg-gray-50 transition-colors">
+          <li v-for="entreprise in entreprises" :key="entreprise.id" class="hover:bg-gray-50 transition-colors">
             <div class="px-6 py-5">
               <div class="flex items-center justify-between">
                 <div class="flex-1">
                   <h3 class="text-lg font-semibold text-gray-900">{{ entreprise.nom }}</h3>
                   <p class="text-sm text-gray-600 mt-1">{{ entreprise.adresse }}</p>
-                  
+
                   <div class="mt-3 flex items-center space-x-4 text-sm text-gray-500">
                     <span class="flex items-center">
                       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +86,7 @@
                       🐝 {{ entreprise.nombreRuches }} ruches
                     </span>
                   </div>
-                  
+
                   <!-- Employés -->
                   <div v-if="entreprise.employes?.length > 0" class="mt-3">
                     <p class="text-xs text-gray-500 font-medium">Employés ({{ entreprise.employes.length }}) :</p>
@@ -124,9 +123,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+const { getToken } = useAuth()
 
 definePageMeta({
-  middleware: 'auth'
+  middleware: 'admin'
 })
 
 // États
@@ -139,13 +139,17 @@ onMounted(async () => {
   await chargerEntreprises()
 })
 
-// Fonction pour charger les entreprises
+// ✅ Fonction pour charger les entreprises
 async function chargerEntreprises() {
   loading.value = true
   error.value = ''
 
   try {
-    const response = await $fetch('http://localhost:3001/entreprises')
+    const response = await $fetch('http://localhost:3001/entreprises', {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
 
     if (response.success) {
       entreprises.value = response.entreprises
@@ -155,9 +159,9 @@ async function chargerEntreprises() {
   } catch (err) {
     error.value = 'Erreur lors du chargement des entreprises: ' + (err.message || 'Erreur inconnue')
     console.error('Erreur:', err)
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
 
 // Fonctions de navigation
@@ -181,9 +185,13 @@ async function supprimerEntreprise(id) {
 
   try {
     await $fetch(`http://localhost:3001/entreprises/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
     })
 
+    // Recharger la liste après suppression
     await chargerEntreprises()
   } catch (err) {
     alert('Erreur lors de la suppression: ' + err.message)

@@ -87,6 +87,7 @@
 </template>
 
 <script setup>
+
 const { getUserId, getToken } = useAuth()
 const comptesRendus = ref([])
 const isModalOpen = ref(false)

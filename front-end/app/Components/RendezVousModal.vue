@@ -140,6 +140,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+const { getUserId, getToken } = useAuth()
 
 const props = defineProps({
     isOpen: Boolean,
@@ -184,17 +185,18 @@ function closeModal() {
 }
 
 async function submitRendezVous() {
+    const userId = getUserId()
     error.value = ''
     success.value = ''
     isSubmitting.value = true
 
     try {
         // Récupérer les infos de l'apiculteur
-        const userData = localStorage.getItem('user')
-        if (!userData) {
+        const userId = getUserId()
+        if (!userId) {
             throw new Error('Utilisateur non connecté')
         }
-        const user = JSON.parse(userData)
+
 
         // Déterminer le contact
         let contactNom, contactPrenom, contactTelephone
@@ -213,7 +215,7 @@ async function submitRendezVous() {
         const dateHeure = new Date(`${formData.value.date}T${formData.value.heure}`)
 
         const rdvData = {
-            apiculteurId: user.id || user.uid,
+            apiculteurId: userId,
             apiculteurNom: user.lastName,
             apiculteurPrenom: user.firstName,
             apiculteurEmail: user.email,
@@ -238,7 +240,7 @@ async function submitRendezVous() {
         const response = await $fetch('http://localhost:3001/rendez-vous', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${getToken()}`
             },
             body: JSON.stringify(rdvData)
         })
@@ -273,7 +275,7 @@ ${formData.value.notes ? `📝 ${formData.value.notes}` : ''}`,
 
                     const calendarResponse = await $fetch('http://localhost:3001/google-calendar/create-event', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
                         body: calendarData
                     })
 

@@ -9,7 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where
+  where,
+  orderBy
 } from 'firebase/firestore';
 // import { Deplacement } from '../Models/Deplacement';
 // import { Recolte } from '../Models/Recolte';
@@ -449,9 +450,8 @@ export class FirestoreService {
   }
 
   async getComptesRendusByStatut(statut: string): Promise<CompteRendu[]> {
-    const { collection, query, where, orderBy, getDocs } = await import('firebase/firestore');
-
-    const comptesRendusRef = collection(this.firestore, 'comptes-rendus');
+    // ✅ Utilise les imports du haut, pas de await import()
+    const comptesRendusRef = collection(this.firestore, 'comptes_rendus');
     const q = query(
       comptesRendusRef,
       where('statut', '==', statut),
@@ -464,6 +464,7 @@ export class FirestoreService {
       ...doc.data()
     } as CompteRendu));
   }
+
 
 
 

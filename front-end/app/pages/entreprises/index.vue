@@ -175,9 +175,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-definePageMeta({
-  middleware: 'auth'
-})
+// definePageMeta({
+//   middleware: 'auth'
+// })
 
 // États
 const entreprises = ref([])

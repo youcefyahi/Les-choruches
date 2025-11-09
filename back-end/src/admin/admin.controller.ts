@@ -1,5 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('admin')
 export class AdminController {
@@ -30,5 +32,23 @@ export class AdminController {
   @Post('logout')
   async logout() {
     return await this.adminService.logout();
+  }
+
+  // ✅ NOUVELLE ROUTE POUR LES STATS
+  @Get('stats')
+  @UseGuards(AuthGuard, AdminGuard)
+  async getStats() {
+    try {
+      const stats = await this.adminService.getStatistics();
+      return {
+        success: true,
+        stats,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
   }
 }
