@@ -47,24 +47,25 @@
           </div>
         </div>
 
-        <!-- Card Apiculteurs -->
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+        <!-- Card Validation -->
+        <div @click="goToValidation"
+          class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer p-6 border-l-4 border-orange-500">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Apiculteurs</h3>
-              <p class="text-sm text-gray-600 mt-1">Utilisateurs actifs</p>
+              <h3 class="text-lg font-semibold text-gray-900">Validation</h3>
+              <p class="text-sm text-gray-600 mt-1">Comptes rendus en attente</p>
             </div>
-            <div class="bg-green-100 p-3 rounded-full">
-              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-orange-100 p-3 rounded-full">
+              <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
                 </path>
               </svg>
             </div>
           </div>
           <div class="mt-4">
-            <p class="text-2xl font-bold text-gray-900">{{ stats.apiculteurs }}</p>
-            <p class="text-xs text-gray-500">apiculteurs inscrits</p>
+            <p class="text-2xl font-bold text-gray-900">{{ stats.comptesRendusEnAttente }}</p>
+            <p class="text-xs text-gray-500">à valider</p>
           </div>
         </div>
 
@@ -103,14 +104,14 @@
               <span class="text-gray-700">Nouvelle entreprise</span>
             </button>
             
-            <button @click="goToEntreprises"
+            <button @click="goToValidation"
               class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-              <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
                 </path>
               </svg>
-              <span class="text-gray-700">Voir toutes les entreprises</span>
+              <span class="text-gray-700">Valider les comptes rendus</span>
             </button>
           </div>
         </div>
@@ -120,26 +121,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+const { getUser, getToken, logout } = useAuth()
 
 definePageMeta({
-  middleware: 'auth'
+  middleware: 'admin'
 })
 
 const admin = ref(null)
 const stats = ref({
   entreprises: 0,
-  apiculteurs: 0,
+  comptesRendusEnAttente: 0,
   registres: 0
 })
 
 onMounted(async () => {
-  // Récupérer les infos de l'admin
-  const adminData = localStorage.getItem('admin')
-  if (adminData) {
-    admin.value = JSON.parse(adminData)
-  } else {
+  // Récupérer les infos de l'admin avec useAuth
+  admin.value = getUser()
+  
+  if (!admin.value) {
     navigateTo('/admin/login')
+    return
   }
 
   // Charger les statistiques
@@ -148,10 +149,26 @@ onMounted(async () => {
 
 async function loadStats() {
   try {
+    const token = getToken()
+    
     // Charger le nombre d'entreprises
-    const entreprisesResponse = await $fetch('http://localhost:3001/entreprises')
+    const entreprisesResponse = await $fetch('http://localhost:3001/entreprises', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     if (entreprisesResponse.success) {
       stats.value.entreprises = entreprisesResponse.entreprises.length
+    }
+
+    // Charger le nombre de comptes rendus en attente
+    const comptesRendusResponse = await $fetch('http://localhost:3001/comptes-rendus/en-attente', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    if (comptesRendusResponse.success) {
+      stats.value.comptesRendusEnAttente = comptesRendusResponse.comptes_rendus.length
     }
   } catch (err) {
     console.error('Erreur lors du chargement des stats:', err)
@@ -162,18 +179,12 @@ function goToEntreprises() {
   navigateTo('/admin/entreprises')
 }
 
+function goToValidation() {
+  navigateTo('/admin/validation')
+}
+
 async function handleLogout() {
-  try {
-    await $fetch('http://localhost:3001/admin/logout', {
-      method: 'POST'
-    })
-    
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('admin')
-    
-    navigateTo('/admin/login')
-  } catch (err) {
-    console.error('Erreur lors de la déconnexion:', err)
-  }
+  await logout()
+  navigateTo('/admin/login')
 }
 </script>

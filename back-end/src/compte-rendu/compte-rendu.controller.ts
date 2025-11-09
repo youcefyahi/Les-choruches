@@ -17,17 +17,28 @@ import { AdminGuard } from '../auth/admin.guard';
 @Controller('comptes-rendus')
 @UseGuards(AuthGuard)
 export class ComptesRendusController {
-  constructor(private comptesRendusService: CompteRenduService) { }
+  constructor(private comptesRendusService: CompteRenduService) {}
 
   @Post()
   async create(@Body() data: any, @Request() req) {
     const compteRenduData = {
       ...data,
       apiculteur_id: req.user.id,
-      statut: 'brouillon', // Statut initial
+      statut: 'brouillon',
     };
     const id = await this.comptesRendusService.create(compteRenduData);
     return { success: true, id };
+  }
+
+  /**
+   * Lister les comptes rendus en attente (admin uniquement)
+   * ⚠️ IMPORTANT : Cette route DOIT être AVANT @Get(':id')
+   */
+  @Get('en-attente')
+  @UseGuards(AdminGuard)
+  async getComptesRendusEnAttente() {
+    const comptesRendus = await this.comptesRendusService.getComptesRendusEnAttente();
+    return { success: true, comptes_rendus: comptesRendus };
   }
 
   @Get('apiculteur/:apiculteurId')
@@ -93,16 +104,6 @@ export class ComptesRendusController {
   async soumettreValidation(@Param('id') id: string, @Request() req) {
     await this.comptesRendusService.soumettreValidation(id, req.user.id);
     return { success: true, message: 'Compte rendu soumis pour validation' };
-  }
-
-  /**
-   * Lister les comptes rendus en attente (admin uniquement)
-   */
-  @Get('en-attente')
-  @UseGuards(AdminGuard)
-  async getComptesRendusEnAttente() {
-    const comptesRendus = await this.comptesRendusService.getComptesRendusEnAttente();
-    return { success: true, comptes_rendus: comptesRendus };
   }
 
   /**

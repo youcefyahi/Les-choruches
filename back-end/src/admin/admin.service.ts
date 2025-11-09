@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut
 } from 'firebase/auth';
@@ -12,7 +12,7 @@ export class AdminService {
   constructor(
     @Inject('FIREBASE_AUTH') private auth: Auth,
     private firestoreService: FirestoreService
-  ) {}
+  ) { }
 
   async register(email: string, password: string, firstName: string, lastName: string, phone?: string) {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -37,10 +37,15 @@ export class AdminService {
   async login(email: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
     const firebaseUser = userCredential.user;
-
+  
+  
     const admin = await this.firestoreService.getAdminByEmail(email);
+      console.log('🎉 ADMIN FFFF !',admin);
 
     if (!admin) {
+      console.log('🎉 CONNEXION PAS !');
+
+      console.log('=== FIN CONNEXION ===');
       throw new Error('Compte admin introuvable');
     }
 
