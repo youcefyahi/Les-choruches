@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CompteRenduController } from './compte-rendu.controller';
+import { ComptesRendusController } from './compte-rendu.controller';
 import { CompteRenduService } from './compte-rendu.service';
-import { FirestoreService } from '../firestore/firestore.service';
 
 @Module({
-  controllers: [CompteRenduController],
-  providers: [CompteRenduService, FirestoreService],
-  exports: [CompteRenduService],
+  controllers: [ComptesRendusController],
+  providers: [CompteRenduService],
+  exports: [CompteRenduService],  // ← Exporte le service pour MurModule
 })
-export class CompteRenduModule {}
+export class ComptesRendusModule {}

@@ -11,18 +11,20 @@ import { RendezVousModule } from './rendez-vous/rendez-vous.module';
 import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { ActionsSaisonnieresModule } from './actions-saisonnieres/actions-saisonnieres.module';
 import { PhotoSuggestionsModule } from './photo-suggestions/photo-suggestions.module';
-import { CompteRenduModule } from './compte-rendu/compte-rendu.module';
+import { ComptesRendusModule } from './compte-rendu/compte-rendu.module';
 import { AIModule } from './ai/ai.module';
 import { UploadModule } from './upload/upload.module';
+import { MurModule } from './mur/mur.module';
+
 
 
 
 
 
 @Module({
-  imports: [ConfigModule.forRoot(),FirebaseModule,AuthModule,RegistresModule,EntreprisesModule,AdminModule,RendezVousModule,GoogleCalendarModule,ActionsSaisonnieresModule,PhotoSuggestionsModule,CompteRenduModule,AIModule,UploadModule],
+  imports: [ConfigModule.forRoot(), FirebaseModule, AuthModule, RegistresModule, EntreprisesModule, AdminModule, RendezVousModule, GoogleCalendarModule, ActionsSaisonnieresModule, PhotoSuggestionsModule, ComptesRendusModule, AIModule, UploadModule, MurModule],
   controllers: [AppController],
   providers: [AppService],
-  
+
 })
-export class AppModule {}
+export class AppModule { }

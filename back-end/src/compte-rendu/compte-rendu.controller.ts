@@ -1,82 +1,131 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Request, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Patch,
+  Param,
+  Body,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { CompteRenduService } from './compte-rendu.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('comptes-rendus')
 @UseGuards(AuthGuard)
-export class CompteRenduController {
-  constructor(private compteRenduService: CompteRenduService) { }
+export class ComptesRendusController {
+  constructor(private comptesRendusService: CompteRenduService) { }
 
   @Post()
   async create(@Body() data: any, @Request() req) {
     const compteRenduData = {
       ...data,
-      apiculteur_id: req.user.id
+      apiculteur_id: req.user.id,
+      statut: 'brouillon', // Statut initial
     };
-    const id = await this.compteRenduService.create(compteRenduData);
+    const id = await this.comptesRendusService.create(compteRenduData);
     return { success: true, id };
   }
 
   @Get('apiculteur/:apiculteurId')
   async getByApiculteur(@Param('apiculteurId') apiculteurId: string, @Request() req) {
-    // ← AJOUTER CES LOGS
-    console.log('🆔 CompteRendu - Comparaison:', {
-      url_param: apiculteurId,
-      token_user: req.user.id,
-      sont_egaux: apiculteurId === req.user.id
-    });
-
     if (apiculteurId !== req.user.id) {
       throw new Error('Accès interdit');
     }
-    const comptes_rendus = await this.compteRenduService.getByApiculteur(apiculteurId);
+    const comptes_rendus = await this.comptesRendusService.getByApiculteur(apiculteurId);
     return { success: true, comptes_rendus };
   }
 
   @Get(':id')
   async getById(@Param('id') id: string, @Request() req) {
-    const compte_rendu = await this.compteRenduService.getById(id);
+    const compte_rendu = await this.comptesRendusService.getById(id);
 
-    // ← VÉRIFICATION NULL
     if (!compte_rendu) {
-      throw new NotFoundException('Compte rendu introuvable');
+      throw new Error('Compte rendu introuvable');
     }
 
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
+
     return { success: true, compte_rendu };
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: any, @Request() req) {
-    const compte_rendu = await this.compteRenduService.getById(id);
+    const compte_rendu = await this.comptesRendusService.getById(id);
 
-    // ← VÉRIFICATION NULL
     if (!compte_rendu) {
-      throw new NotFoundException('Compte rendu introuvable');
+      throw new Error('Compte rendu introuvable');
     }
 
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
-    await this.compteRenduService.update(id, data);
+
+    await this.comptesRendusService.update(id, data);
     return { success: true };
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req) {
-    const compte_rendu = await this.compteRenduService.getById(id);
+    const compte_rendu = await this.comptesRendusService.getById(id);
 
-    // ← VÉRIFICATION NULL
     if (!compte_rendu) {
-      throw new NotFoundException('Compte rendu introuvable');
+      throw new Error('Compte rendu introuvable');
     }
 
     if (compte_rendu.apiculteur_id !== req.user.id) {
       throw new Error('Accès interdit');
     }
-    await this.compteRenduService.delete(id);
+
+    await this.comptesRendusService.delete(id);
     return { success: true };
+  }
+
+  /**
+   * Soumettre un compte rendu pour validation
+   */
+  @Patch(':id/soumettre')
+  async soumettreValidation(@Param('id') id: string, @Request() req) {
+    await this.comptesRendusService.soumettreValidation(id, req.user.id);
+    return { success: true, message: 'Compte rendu soumis pour validation' };
+  }
+
+  /**
+   * Lister les comptes rendus en attente (admin uniquement)
+   */
+  @Get('en-attente')
+  @UseGuards(AdminGuard)
+  async getComptesRendusEnAttente() {
+    const comptesRendus = await this.comptesRendusService.getComptesRendusEnAttente();
+    return { success: true, comptes_rendus: comptesRendus };
+  }
+
+  /**
+   * Valider un compte rendu (admin uniquement)
+   */
+  @Patch(':id/valider')
+  @UseGuards(AdminGuard)
+  async validerCompteRendu(@Param('id') id: string, @Request() req) {
+    await this.comptesRendusService.validerCompteRendu(id, req.user.id);
+    return { success: true, message: 'Compte rendu validé' };
+  }
+
+  /**
+   * Rejeter un compte rendu (admin uniquement)
+   */
+  @Patch(':id/rejeter')
+  @UseGuards(AdminGuard)
+  async rejeterCompteRendu(
+    @Param('id') id: string,
+    @Body() body: { motif: string },
+    @Request() req,
+  ) {
+    await this.comptesRendusService.rejeterCompteRendu(id, req.user.id, body.motif);
+    return { success: true, message: 'Compte rendu rejeté' };
   }
 }
