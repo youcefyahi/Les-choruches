@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import * as admin from 'firebase-admin'; // ← Ajouter
 import { getStorage } from 'firebase/storage';
+import * as admin from 'firebase-admin';
 
 @Global()
 @Module({
@@ -44,14 +44,17 @@ import { getStorage } from 'firebase/storage';
       },
       inject: [ConfigService],
     },
-    // ← AJOUTER Firebase Admin
     {
       provide: 'FIREBASE_ADMIN',
       useFactory: (configService: ConfigService) => {
         if (!admin.apps.length) {
           admin.initializeApp({
-            projectId: configService.get('FIREBASE_PROJECT_ID'),
-            // Pour la production, ajoute le service account ici
+            credential: admin.credential.cert({
+              projectId: configService.get('FIREBASE_PROJECT_ID'),
+              privateKey: configService.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
+              clientEmail: configService.get('FIREBASE_CLIENT_EMAIL'),
+            }),
+            storageBucket: configService.get('FIREBASE_STORAGE_BUCKET'),
           });
         }
         return admin;
@@ -75,8 +78,7 @@ import { getStorage } from 'firebase/storage';
       },
       inject: [ConfigService],
     },
-
   ],
-  exports: ['FIRESTORE', 'FIREBASE_AUTH', 'FIREBASE_ADMIN'], // ← Exporter
+  exports: ['FIRESTORE', 'FIREBASE_AUTH', 'FIREBASE_ADMIN', 'FIREBASE_STORAGE'],
 })
 export class FirebaseModule { }

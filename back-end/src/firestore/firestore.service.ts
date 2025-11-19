@@ -9,7 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where
+  where,
+  orderBy
 } from 'firebase/firestore';
 // import { Deplacement } from '../Models/Deplacement';
 // import { Recolte } from '../Models/Recolte';
@@ -296,8 +297,14 @@ export class FirestoreService {
 
   async createAdmin(admin: Omit<Admin, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const now = new Date();
+
+    // ✅ CORRECTION : Filtrer les undefined
+    const cleanAdmin = Object.fromEntries(
+      Object.entries(admin).filter(([_, value]) => value !== undefined)
+    );
+
     const docRef = await addDoc(collection(this.firestore, 'admins'), {
-      ...admin,
+      ...cleanAdmin,
       role: 'admin',
       createdAt: now,
       updatedAt: now,
@@ -441,6 +448,23 @@ export class FirestoreService {
       throw error;
     }
   }
+
+  async getComptesRendusByStatut(statut: string): Promise<CompteRendu[]> {
+    // ✅ Utilise les imports du haut, pas de await import()
+    const comptesRendusRef = collection(this.firestore, 'comptes_rendus');
+    const q = query(
+      comptesRendusRef,
+      where('statut', '==', statut),
+      orderBy('created_at', 'desc')
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as CompteRendu));
+  }
+
 
 
 

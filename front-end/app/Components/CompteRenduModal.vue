@@ -5,7 +5,7 @@
                 <h2 class="text-xl font-bold text-gray-800">
                     {{ compteRendu ? 'Modifier' : 'Nouveau' }} Compte Rendu
                 </h2>
-                <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <button type="button" @click="$emit('close')" class="text-gray-500 hover:text-gray-700 text-2xl">
                     ×
                 </button>
             </div>
@@ -38,7 +38,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Observations (texte)</label>
                     <textarea v-model="form.observations_texte" rows="4" placeholder="Décrivez vos observations..."
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          </textarea>
+                    </textarea>
                 </div>
 
                 <!-- Observations audio -->
@@ -53,7 +53,6 @@
                     <input type="file" multiple accept="image/*" @change="handlePhotosUpload"
                         :disabled="isUploadingPhotos" class="w-full border border-gray-300 rounded-lg px-3 py-2">
 
-                    <!-- Loading photos -->
                     <div v-if="isUploadingPhotos" class="text-sm text-blue-600 mt-2">
                         ⏳ Upload photos en cours...
                     </div>
@@ -76,7 +75,6 @@
                     <input type="file" multiple accept="video/*" @change="handleVideosUpload"
                         :disabled="isUploadingVideos" class="w-full border border-gray-300 rounded-lg px-3 py-2">
 
-                    <!-- Loading vidéos -->
                     <div v-if="isUploadingVideos" class="text-sm text-blue-600 mt-2">
                         ⏳ Upload vidéos en cours...
                     </div>
@@ -113,12 +111,29 @@
                     </div>
                 </div>
 
+                <!-- Résultat IA -->
+                <div v-if="aiResult" class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <label class="block text-sm font-medium text-green-700 mb-2">📝 Compte rendu enrichi par IA
+                        :</label>
+                    <div class="text-sm text-green-800 whitespace-pre-wrap">{{ aiResult }}</div>
+                    <button type="button" @click="copyAIResult"
+                        class="mt-2 text-xs text-green-600 hover:text-green-800">
+                        📋 Copier le texte
+                    </button>
+                </div>
+
                 <!-- Boutons -->
                 <div class="flex justify-end space-x-2 pt-4">
                     <button type="button" @click="$emit('close')"
                         class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
                         Annuler
                     </button>
+
+                    <button type="button" @click="enhanceWithAI" :disabled="isEnhancingWithAI"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50">
+                        {{ isEnhancingWithAI ? '⏳ IA en cours...' : '✨ Enrichir avec IA' }}
+                    </button>
+
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                         {{ compteRendu ? 'Modifier' : 'Créer' }}
                     </button>
@@ -131,12 +146,18 @@
 <script setup>
 import { uploadPhoto, uploadVideo } from '~/utils/firebaseStorage'
 
+// ✅ CORRECTION : Utilise le composable useAuth
+const { user, getUserId, getToken } = useAuth()
+
+const isEnhancingWithAI = ref(false)
+const aiResult = ref('')
+
 const props = defineProps({
     isOpen: Boolean,
     compteRendu: Object
 })
 
-
+const emit = defineEmits(['close', 'save'])
 
 const form = ref({
     date: '',
@@ -148,7 +169,6 @@ const form = ref({
     personnel_present: []
 })
 
-// États de chargement
 const isUploadingPhotos = ref(false)
 const isUploadingVideos = ref(false)
 
@@ -176,36 +196,31 @@ watch(() => props.compteRendu, (newValue) => {
     }
 }, { immediate: true })
 
-const emit = defineEmits(['close', 'save']) // ← GARDE seulement celui-ci
-
-// ... plus loin dans le code ...
-
 const handleSubmit = () => {
-    emit('save', form.value) // ← Utilise directement emit
+    emit('save', form.value)
 }
 
-
-// ← MODIFIÉ : Reçoit maintenant l'URL Firebase
 const handleAudioRecorded = (audioUrl) => {
     if (audioUrl) {
-        form.value.observations_audio_url = audioUrl // URL Firebase directement
+        form.value.observations_audio_url = audioUrl
     } else {
         form.value.observations_audio_url = ''
     }
 }
 
-// ← MODIFIÉ : Upload réel vers Firebase
+// ✅ CORRECTION : Utilise getUserId() du composable
 const handlePhotosUpload = async (event) => {
     const files = Array.from(event.target.files)
-    const user = useState('user')
 
     if (files.length === 0) return
 
     isUploadingPhotos.value = true
 
     try {
+        const userId = getUserId()  // ← Utilise le composable
+
         for (const file of files) {
-            const photoData = await uploadPhoto(file, user.value.id)
+            const photoData = await uploadPhoto(file, userId)
             form.value.photos.push(photoData)
         }
     } catch (error) {
@@ -213,23 +228,23 @@ const handlePhotosUpload = async (event) => {
         alert('Erreur lors de l\'upload des photos')
     } finally {
         isUploadingPhotos.value = false
-        // Reset l'input
         event.target.value = ''
     }
 }
 
-// ← MODIFIÉ : Upload réel vers Firebase
+// ✅ CORRECTION : Utilise getUserId() du composable
 const handleVideosUpload = async (event) => {
     const files = Array.from(event.target.files)
-    const user = useState('user')
 
     if (files.length === 0) return
 
     isUploadingVideos.value = true
 
     try {
+        const userId = getUserId()  // ← Utilise le composable
+
         for (const file of files) {
-            const videoData = await uploadVideo(file, user.value.id)
+            const videoData = await uploadVideo(file, userId)
             form.value.videos.push(videoData)
         }
     } catch (error) {
@@ -237,7 +252,6 @@ const handleVideosUpload = async (event) => {
         alert('Erreur lors de l\'upload des vidéos')
     } finally {
         isUploadingVideos.value = false
-        // Reset l'input
         event.target.value = ''
     }
 }
@@ -256,5 +270,40 @@ const addPersonne = () => {
 
 const removePersonne = (index) => {
     form.value.personnel_present.splice(index, 1)
+}
+
+const enhanceWithAI = async () => {
+    if (!form.value.observations_texte && !form.value.observations_audio_url) {
+        alert('Ajoutez d\'abord des observations (texte ou audio) pour utiliser l\'IA !')
+        return
+    }
+
+    isEnhancingWithAI.value = true
+
+    try {
+        const response = await $fetch('http://localhost:3001/ai/enhance-compte-rendu', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`,
+                'Content-Type': 'application/json'
+            },
+            body: {
+                compteRendu: form.value
+            }
+        })
+
+        aiResult.value = response.enhancedText
+
+    } catch (error) {
+        console.error('Erreur IA:', error)
+        alert('Erreur lors de l\'enrichissement IA')
+    } finally {
+        isEnhancingWithAI.value = false
+    }
+}
+
+const copyAIResult = () => {
+    navigator.clipboard.writeText(aiResult.value)
+    alert('Texte copié !')
 }
 </script>

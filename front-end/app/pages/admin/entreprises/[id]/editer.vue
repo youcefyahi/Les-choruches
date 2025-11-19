@@ -25,11 +25,11 @@
     <!-- Main Content -->
     <main v-else class="max-w-4xl mx-auto px-4 py-8">
       <form @submit.prevent="handleSubmit" class="bg-white shadow-lg rounded-lg p-6 space-y-6">
-        
+
         <!-- Informations de l'entreprise -->
         <div class="border-b pb-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'entreprise</h2>
-          
+
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Nom de l'entreprise *</label>
@@ -60,7 +60,7 @@
         <!-- Référent de l'entreprise -->
         <div class="border-b pb-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Référent de l'entreprise</h2>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Prénom *</label>
@@ -110,8 +110,7 @@
               class="border border-gray-200 rounded-md p-4 bg-gray-50">
               <div class="flex items-start justify-between mb-3">
                 <h3 class="text-sm font-medium text-gray-700">Employé {{ index + 1 }}</h3>
-                <button type="button" @click="retirerEmploye(index)"
-                  class="text-red-600 hover:text-red-800 text-sm">
+                <button type="button" @click="retirerEmploye(index)" class="text-red-600 hover:text-red-800 text-sm">
                   Retirer
                 </button>
               </div>
@@ -173,10 +172,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue';
+const { getToken } = useAuth();
 
 definePageMeta({
-  middleware: 'auth'
+  middleware: 'admin'
 })
 
 const route = useRoute()
@@ -203,21 +203,28 @@ onMounted(async () => {
 })
 
 async function chargerEntreprise() {
-  loading.value = true
+  loading.value = true;
 
   try {
-    const response = await $fetch(`http://localhost:3001/entreprises/${entrepriseId}`)
+    const response = await $fetch(`http://localhost:3001/entreprises/${entrepriseId}`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    });
 
     if (response.success) {
-      formData.value = { ...response.entreprise }
+      formData.value = { ...response.entreprise };
+    } else {
+      throw new Error('Erreur lors du chargement de l’entreprise');
     }
   } catch (err) {
-    console.error('Erreur:', err)
-    error.value = 'Erreur lors du chargement de l\'entreprise'
+    console.error('Erreur:', err);
+    error.value = 'Erreur lors du chargement de l’entreprise: ' + (err.message || 'Erreur inconnue');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+
 
 function ajouterEmploye() {
   formData.value.employes.push({
@@ -244,7 +251,7 @@ async function handleSubmit() {
     const response = await $fetch(`http://localhost:3001/entreprises/${entrepriseId}`, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${getToken()}`
       },
       body: JSON.stringify(formData.value)
     })

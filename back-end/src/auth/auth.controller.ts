@@ -24,19 +24,13 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    console.log('=== DÉBUT CONNEXION ===');
-    console.log('📧 Email:', body.email);
+
 
     try {
       const result = await this.authService.login(body.email, body.password);
 
       console.log('🎉 CONNEXION RÉUSSIE !');
-      console.log('🆔 UID Firebase:', result.uid);
-      console.log('🧑‍🌾 Apiculteur ID:', result.apiculteur?.id || 'Non trouvé');
-      console.log('📧 Email confirmé:', result.email);
-      console.log('🔑 Token généré:', result.token ? 'OUI' : 'NON');
-      console.log('=== FIN CONNEXION ===');
-
+     
       return result;
 
     } catch (error) {

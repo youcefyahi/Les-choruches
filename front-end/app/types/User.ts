@@ -4,5 +4,6 @@ export interface User {
   firstName: string
   lastName: string
   phone?: string
-  firestoreId: string
+  firestoreId?: string
+  role?: 'apiculteur' | 'admin'
 }

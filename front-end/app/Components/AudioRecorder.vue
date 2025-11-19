@@ -9,30 +9,22 @@
 
     <!-- Contrôles d'enregistrement -->
     <div class="flex items-center space-x-3 mb-3">
-      <button 
-        v-if="!isRecording && !audioBlob"
-        @click="startRecording"
+      <button type="button" v-if="!isRecording && !audioBlob" @click="startRecording"
         class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
         🎤 Démarrer
       </button>
 
-      <button 
-        v-if="isRecording"
-        @click="stopRecording"
+      <button type="button" v-if="isRecording" @click="stopRecording"
         class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center">
         ⏹️ Arrêter
       </button>
 
-      <button 
-        v-if="audioBlob && !isRecording"
-        @click="playRecording"
+      <button type="button" v-if="audioBlob && !isRecording" @click="playRecording"
         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
         ▶️ Écouter
       </button>
 
-      <button 
-        v-if="audioBlob && !isRecording"
-        @click="resetRecording"
+      <button type="button" v-if="audioBlob && !isRecording" @click="resetRecording"
         class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center">
         🗑️ Recommencer
       </button>
@@ -41,9 +33,8 @@
     <!-- Visualisation -->
     <div v-if="isRecording" class="mb-3">
       <div class="flex items-center space-x-1">
-        <div v-for="i in 20" :key="i" 
-             class="w-1 bg-red-500 rounded-full"
-             :style="{ height: Math.random() * 20 + 5 + 'px' }">
+        <div v-for="i in 20" :key="i" class="w-1 bg-red-500 rounded-full"
+          :style="{ height: Math.random() * 20 + 5 + 'px' }">
         </div>
       </div>
     </div>
@@ -72,6 +63,9 @@
 <script setup>
 import { uploadAudio } from '~/utils/firebaseStorage'
 
+// ✅ CORRECTION : Utilise le composable useAuth
+const { getUserId } = useAuth()
+
 const props = defineProps({
   modelValue: String // URL audio existante
 })
@@ -85,20 +79,20 @@ const audioUrl = ref('')
 const mediaRecorder = ref(null)
 const recordingTimer = ref(null)
 const error = ref('')
-const isUploading = ref(false) // ← NOUVEAU
+const isUploading = ref(false)
 
 // Démarrer l'enregistrement
 const startRecording = async () => {
   try {
     error.value = ''
-    
+
     // Demander permission microphone
-    const stream = await navigator.mediaDevices.getUserMedia({ 
+    const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
         sampleRate: 44100
-      } 
+      }
     })
 
     // Créer MediaRecorder
@@ -112,24 +106,24 @@ const startRecording = async () => {
       chunks.push(event.data)
     }
 
-    // ← MODIFIÉ : Upload vers Firebase après l'arrêt
+    // Upload vers Firebase après l'arrêt
     mediaRecorder.value.onstop = async () => {
       // Créer le blob audio
       audioBlob.value = new Blob(chunks, { type: 'audio/webm' })
       audioUrl.value = URL.createObjectURL(audioBlob.value)
-      
+
       // Arrêter le stream
       stream.getTracks().forEach(track => track.stop())
-      
+
       try {
-        // Upload vers Firebase Storage
+        // ✅ CORRECTION : Utilise getUserId() du composable
         isUploading.value = true
-        const user = useState('user')
-        const firebaseUrl = await uploadAudio(audioBlob.value, user.value.id)
-        
+        const userId = getUserId()
+        const firebaseUrl = await uploadAudio(audioBlob.value, userId)
+
         // Émettre l'URL Firebase au lieu du blob
         emit('audio-recorded', firebaseUrl)
-        
+
       } catch (uploadError) {
         console.error('Erreur upload audio:', uploadError)
         error.value = 'Erreur lors de la sauvegarde'
@@ -191,7 +185,7 @@ const formatTime = (seconds) => {
 // Formatage de la taille
 const formatSize = (bytes) => {
   const kb = bytes / 1024
-  return kb > 1024 ? `${(kb/1024).toFixed(1)} MB` : `${kb.toFixed(1)} KB`
+  return kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb.toFixed(1)} KB`
 }
 
 // Cleanup
