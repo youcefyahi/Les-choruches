@@ -140,7 +140,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-const { getUserId, getToken } = useAuth()
+const { getUser, getToken } = useAuth()
 
 const props = defineProps({
     isOpen: Boolean,
@@ -185,18 +185,20 @@ function closeModal() {
 }
 
 async function submitRendezVous() {
-    const userId = getUserId()
     error.value = ''
     success.value = ''
     isSubmitting.value = true
 
     try {
-        // Récupérer les infos de l'apiculteur
-        const userId = getUserId()
-        if (!userId) {
+        // ✅ Récupérer l'utilisateur complet via useAuth
+        const user = getUser()
+
+        if (!user || !user.firestoreId) {
             throw new Error('Utilisateur non connecté')
         }
 
+        console.log('🔍 FirestoreID pour RDV:', user.firestoreId)
+        console.log('👤 User complet:', user)
 
         // Déterminer le contact
         let contactNom, contactPrenom, contactTelephone
@@ -206,6 +208,9 @@ async function submitRendezVous() {
             contactTelephone = props.entreprise.referentTelephone
         } else {
             const employe = props.entreprise.employes.find(e => e.id === formData.value.contactId)
+            if (!employe) {
+                throw new Error('Employé non trouvé')
+            }
             contactNom = employe.nom
             contactPrenom = employe.prenom
             contactTelephone = employe.telephone
@@ -215,7 +220,7 @@ async function submitRendezVous() {
         const dateHeure = new Date(`${formData.value.date}T${formData.value.heure}`)
 
         const rdvData = {
-            apiculteurId: userId,
+            apiculteurId: user.firestoreId,
             apiculteurNom: user.lastName,
             apiculteurPrenom: user.firstName,
             apiculteurEmail: user.email,
@@ -236,17 +241,18 @@ async function submitRendezVous() {
             statut: 'en_attente'
         }
 
-        // ÉTAPE 1 : Créer le RDV dans ta base de données (comme avant)
+        // ÉTAPE 1 : Créer le RDV dans ta base de données
         const response = await $fetch('http://localhost:3001/rendez-vous', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${getToken()}`
+                'Authorization': `Bearer ${getToken()}`,
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(rdvData)
+            body: rdvData
         })
 
         if (response.success) {
-            // ÉTAPE 2 : Créer l'événement Google Calendar (NOUVEAU)
+            // ÉTAPE 2 : Créer l'événement Google Calendar
             const googleTokens = {
                 accessToken: localStorage.getItem('google_access_token'),
                 refreshToken: localStorage.getItem('google_refresh_token')
@@ -270,12 +276,15 @@ async function submitRendezVous() {
 ${formData.value.notes ? `📝 ${formData.value.notes}` : ''}`,
                         startTime: startTime.toISOString(),
                         endTime: endTime.toISOString(),
-                        attendeeEmail: user.email
+                        attendeeEmail: user.email  // ✅ user est défini au début de la fonction
                     }
 
                     const calendarResponse = await $fetch('http://localhost:3001/google-calendar/create-event', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getToken()}`
+                        },
                         body: calendarData
                     })
 

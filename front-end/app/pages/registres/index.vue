@@ -129,7 +129,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-const { getUserId, getToken } = useAuth()
+const { getToken, getUser } = useAuth()  // ✅ Changé: ajouté getUser
 
 const registres = ref([])
 const loading = ref(true)
@@ -148,7 +148,18 @@ onMounted(() => {
 async function chargerRegistres() {
   loading.value = true
   error.value = ''
-  const userId = getUserId()
+  
+  // ✅ Récupère l'utilisateur complet et utilise firestoreId
+  const user = getUser()
+  const userId = user?.firestoreId
+  
+  console.log('🔍 FirestoreID envoyé au backend:', userId)
+  
+  if (!userId) {
+    error.value = 'Utilisateur non connecté'
+    loading.value = false
+    return
+  }
 
   try {
     const response = await $fetch(`http://localhost:3001/registres/apiculteur/${userId}`, {

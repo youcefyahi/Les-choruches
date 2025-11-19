@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard'; // ← Ajouter
-import { FirestoreService } from '../firestore/firestore.service';
+import { FirestoreService } from '../firestore/base-firestore.service';
 import { AdminGuard } from './admin.guard';
 
 

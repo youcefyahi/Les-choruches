@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ComptesRendusController } from './compte-rendu.controller';
 import { CompteRenduService } from './compte-rendu.service';
 import { FirebaseModule } from '../firebase.module';
-import { FirestoreService } from 'src/firestore/firestore.service';
+import { FirestoreService } from 'src/firestore/base-firestore.service';
 import { LinkedInModule } from '../linkedin/linkedin.module';  
 import { EmailModule } from '../email/email.module';            
 

@@ -138,6 +138,7 @@
 
 <script setup>
 import { ref } from 'vue'
+const { getUser, getToken } = useAuth()  // ✅ Utilise useAuth au lieu de localStorage
 
 definePageMeta({
     middleware: 'auth'
@@ -165,17 +166,18 @@ async function handleSubmit() {
     success.value = ''
 
     try {
-        // Récupérer l'utilisateur connecté
-        const userData = localStorage.getItem('user')
-        if (!userData) {
+        // ✅ Récupérer l'utilisateur via useAuth()
+        const user = getUser()
+        
+        if (!user || !user.firestoreId) {
             throw new Error('Utilisateur non connecté')
         }
 
-        const user = JSON.parse(userData)
+        console.log('🔍 FirestoreID pour création registre:', user.firestoreId)
 
         // Créer l'objet registre
         const nouveauRegistre = {
-            apiculteurId: user.id,
+            apiculteurId: user.firestoreId,  // ✅ Utilise firestoreId au lieu de id
             nomRucher: form.value.nomRucher,
             adresseRucher: form.value.adresseRucher,
             identificationRuche: form.value.identificationRuche,
@@ -190,11 +192,12 @@ async function handleSubmit() {
             observations: []
         }
 
-        // Appel API pour créer le registre
+        // ✅ Appel API avec le token d'authentification
         const response = await $fetch('http://localhost:3001/registres', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`  // ✅ Ajoute le token
             },
             body: nouveauRegistre
         })

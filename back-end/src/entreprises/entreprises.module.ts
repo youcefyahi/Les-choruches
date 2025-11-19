@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EntreprisesController } from './entreprises.controller';
 import { EntreprisesService } from './entreprises.service';
 import { FirebaseModule } from '../firebase.module';
-import { FirestoreService } from 'src/firestore/firestore.service';
+import { FirestoreService } from 'src/firestore/base-firestore.service';
 
 @Module({
   imports: [FirebaseModule],

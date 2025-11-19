@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { RendezVousController } from './rendez-vous.controller';
 import { RendezVousService } from './rendez-vous.service';
 import { FirebaseModule } from '../firebase.module';
-import { FirestoreService } from '../firestore/firestore.service';
+import { FirestoreService } from '../firestore/base-firestore.service';
 
 @Module({
   imports: [FirebaseModule],

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/firestore.service';
+import { FirestoreService } from '../firestore/base-firestore.service';
 import { ActionSaisonniere } from '../Models/actions-saisonnieres/ActionSaisonniere';
 import { CreateActionSaisonniere } from '../Models/actions-saisonnieres/CreateActionSaisonniere';
 import { UpdateActionSaisonniere } from '../Models/actions-saisonnieres/UpdateActionSaisonniere';

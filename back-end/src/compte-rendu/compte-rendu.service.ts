@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/firestore.service';
+import { FirestoreService } from '../firestore/base-firestore.service';
 import { CompteRendu } from '../Models/CompteRendu';
 import { LinkedInService } from '../linkedin/linkedin.service';
 import { EmailService } from '../email/email.service';

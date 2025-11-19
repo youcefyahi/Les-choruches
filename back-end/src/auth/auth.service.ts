@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from 'firebase/auth';
-import { FirestoreService } from '../firestore/firestore.service';
+import { FirestoreService } from '../firestore/base-firestore.service';
 import type { Auth } from 'firebase/auth';
 
 

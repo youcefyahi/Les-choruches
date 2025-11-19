@@ -5,9 +5,24 @@
       <div class="max-w-4xl mx-auto px-4 py-6">
         <div class="flex justify-between items-center">
           <h1 class="text-2xl font-bold text-gray-900">Les Échoruches</h1>
-          <button @click="logout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
-            Déconnexion
-          </button>
+
+          <!-- ✅ AJOUT : Boutons Paramètres + Déconnexion -->
+          <div class="flex items-center space-x-3">
+            <button @click="navigateTo('/parametres')"
+              class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Paramètres
+            </button>
+            <button @click="logout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
+              Déconnexion
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -142,22 +157,17 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// ✅ NOUVEAU : Utilise le composable useAuth
 const { user, logout: authLogout, getUserId, getToken } = useAuth()
 
-// Données pour les actions
 const actionsCurrentMonth = ref([])
 const loadingActions = ref(false)
-
-// Données pour les modales
 const isModalOpen = ref(false)
 const isGuidePhotosOpen = ref(false)
 
-// ✅ NOUVEAU : Fonction corrigée avec useAuth
 const loadComptesRendusCount = async () => {
   try {
-    const userId = getUserId() // ← Utilise getUserId() au lieu de useState('user')
-    const token = getToken()   // ← Utilise getToken() pour l'auth
+    const userId = getUserId()
+    const token = getToken()
 
     const response = await $fetch(`http://localhost:3001/comptes-rendus/apiculteur/${userId}`, {
       headers: {
@@ -171,17 +181,15 @@ const loadComptesRendusCount = async () => {
   }
 }
 
-// ✅ NOUVEAU : Déconnexion avec composable
 function logout() {
-  authLogout() // ← Utilise la fonction du composable
-  navigateTo('/connexion') // ← Ou '/login' selon ton fichier
+  authLogout()
+  navigateTo('/connexion')
 }
 
-// ✅ NOUVEAU : Fonction corrigée avec useAuth
 async function loadActionsCurrentMonth() {
   try {
     loadingActions.value = true
-    const userId = getUserId() // ← Utilise getUserId() au lieu de localStorage
+    const userId = getUserId()
     if (!userId) return
 
     const response = await $fetch(`http://localhost:3001/actions-saisonnieres/apiculteur/${userId}/current-month`)
@@ -196,7 +204,6 @@ async function loadActionsCurrentMonth() {
   }
 }
 
-// Navigation
 function goToEntreprises() {
   navigateTo('/entreprises')
 }
@@ -205,7 +212,6 @@ function allerAuxRegistres() {
   navigateTo('/registres')
 }
 
-// Fonctions modale actions saisonnières
 function openSaisonModal() {
   isModalOpen.value = true
 }
@@ -214,7 +220,6 @@ function closeModal() {
   isModalOpen.value = false
 }
 
-// Fonctions modale guide photos
 function openGuidePhotos() {
   isGuidePhotosOpen.value = true
 }
@@ -223,7 +228,6 @@ function closeGuidePhotos() {
   isGuidePhotosOpen.value = false
 }
 
-// Mettre à jour le statut d'une action
 async function updateActionStatus({ actionId, status }) {
   try {
     const response = await $fetch(`http://localhost:3001/actions-saisonnieres/${actionId}`, {
@@ -240,14 +244,8 @@ async function updateActionStatus({ actionId, status }) {
   }
 }
 
-// ✅ NOUVEAU : Plus besoin de charger depuis localStorage
 onMounted(async () => {
   await loadActionsCurrentMonth()
   await loadComptesRendusCount()
 })
-
-// ✅ SUPPRIMÉ temporairement - corrige d'abord le middleware
-// definePageMeta({
-//   middleware: 'auth'
-// })
 </script>
