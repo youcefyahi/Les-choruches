@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { CompteRenduFirestoreService } from '../firestore/compte-rendu-firestore.service'; // ✅ CHANGÉ
 import { CompteRendu } from '../Models/CompteRendu';
 import { LinkedInService } from '../linkedin/linkedin.service';
 import { EmailService } from '../email/email.service';
@@ -7,7 +7,7 @@ import { EmailService } from '../email/email.service';
 @Injectable()
 export class CompteRenduService {
   constructor(
-    private firestoreService: FirestoreService,
+    private compteRenduFirestoreService: CompteRenduFirestoreService, // ✅ CHANGÉ
     private linkedInService: LinkedInService,
     private emailService: EmailService,
   ) {}
@@ -20,15 +20,15 @@ export class CompteRenduService {
       updated_at: now,
     };
 
-    return this.firestoreService.createCompteRendu(compteRendu);
+    return this.compteRenduFirestoreService.createCompteRendu(compteRendu); // ✅ CHANGÉ
   }
 
   async getByApiculteur(apiculteurId: string): Promise<CompteRendu[]> {
-    return this.firestoreService.getComptesRendusByApiculteur(apiculteurId);
+    return this.compteRenduFirestoreService.getComptesRendusByApiculteur(apiculteurId); // ✅ CHANGÉ
   }
 
   async getById(id: string): Promise<CompteRendu | null> {
-    return this.firestoreService.getCompteRenduById(id);
+    return this.compteRenduFirestoreService.getCompteRenduById(id); // ✅ CHANGÉ
   }
 
   async update(id: string, data: Partial<CompteRendu>): Promise<void> {
@@ -37,15 +37,15 @@ export class CompteRenduService {
       updated_at: new Date(),
     };
 
-    return this.firestoreService.updateCompteRendu(id, updateData);
+    return this.compteRenduFirestoreService.updateCompteRendu(id, updateData); // ✅ CHANGÉ
   }
 
   async delete(id: string): Promise<void> {
-    return this.firestoreService.deleteCompteRendu(id);
+    return this.compteRenduFirestoreService.deleteCompteRendu(id); // ✅ CHANGÉ
   }
 
   async soumettreValidation(id: string, apiculteurId: string): Promise<void> {
-    const compteRendu = await this.firestoreService.getCompteRenduById(id);
+    const compteRendu = await this.compteRenduFirestoreService.getCompteRenduById(id); // ✅ CHANGÉ
 
     if (!compteRendu) {
       throw new Error('Compte rendu introuvable');
@@ -59,17 +59,17 @@ export class CompteRenduService {
       throw new Error('Ce compte rendu ne peut plus être soumis');
     }
 
-    await this.firestoreService.updateCompteRendu(id, {
+    await this.compteRenduFirestoreService.updateCompteRendu(id, { // ✅ CHANGÉ
       statut: 'en_attente_validation',
     });
   }
 
   async getComptesRendusEnAttente(): Promise<CompteRendu[]> {
-    return this.firestoreService.getComptesRendusByStatut('en_attente_validation');
+    return this.compteRenduFirestoreService.getComptesRendusByStatut('en_attente_validation'); // ✅ CHANGÉ
   }
 
   async validerCompteRendu(id: string, adminId: string): Promise<void> {
-    const compteRendu = await this.firestoreService.getCompteRenduById(id);
+    const compteRendu = await this.compteRenduFirestoreService.getCompteRenduById(id); // ✅ CHANGÉ
 
     if (!compteRendu) {
       throw new Error('Compte rendu introuvable');
@@ -80,7 +80,7 @@ export class CompteRenduService {
     }
 
     // 1. Mettre à jour le statut dans Firestore
-    await this.firestoreService.updateCompteRendu(id, {
+    await this.compteRenduFirestoreService.updateCompteRendu(id, { // ✅ CHANGÉ
       statut: 'validé',
       date_validation: new Date(),
       validé_par: adminId,
@@ -106,7 +106,7 @@ export class CompteRenduService {
   }
 
   async rejeterCompteRendu(id: string, adminId: string, motif: string): Promise<void> {
-    const compteRendu = await this.firestoreService.getCompteRenduById(id);
+    const compteRendu = await this.compteRenduFirestoreService.getCompteRenduById(id); // ✅ CHANGÉ
 
     if (!compteRendu) {
       throw new Error('Compte rendu introuvable');
@@ -116,7 +116,7 @@ export class CompteRenduService {
       throw new Error("Ce compte rendu n'est pas en attente de validation");
     }
 
-    await this.firestoreService.updateCompteRendu(id, {
+    await this.compteRenduFirestoreService.updateCompteRendu(id, { // ✅ CHANGÉ
       statut: 'rejeté',
       date_validation: new Date(),
       validé_par: adminId,
@@ -125,6 +125,6 @@ export class CompteRenduService {
   }
 
   async getComptesRendusValides(): Promise<CompteRendu[]> {
-    return this.firestoreService.getComptesRendusByStatut('validé');
+    return this.compteRenduFirestoreService.getComptesRendusByStatut('validé'); // ✅ CHANGÉ
   }
 }

@@ -14,7 +14,8 @@ import { PhotoSuggestionsModule } from './photo-suggestions/photo-suggestions.mo
 import { ComptesRendusModule } from './compte-rendu/compte-rendu.module';
 import { AIModule } from './ai/ai.module';
 import { UploadModule } from './upload/upload.module';
-import { MurModule } from './mur/mur.module';
+
+import { FirestoreModule } from './firestore/firestore.module';
 
 
 
@@ -22,7 +23,7 @@ import { MurModule } from './mur/mur.module';
 
 
 @Module({
-  imports: [ConfigModule.forRoot(), FirebaseModule, AuthModule, RegistresModule, EntreprisesModule, AdminModule, RendezVousModule, GoogleCalendarModule, ActionsSaisonnieresModule, PhotoSuggestionsModule, ComptesRendusModule, AIModule, UploadModule, MurModule],
+  imports: [ConfigModule.forRoot(), FirestoreModule,FirebaseModule, AuthModule, RegistresModule, EntreprisesModule, AdminModule, RendezVousModule, GoogleCalendarModule, ActionsSaisonnieresModule, PhotoSuggestionsModule, ComptesRendusModule, AIModule, UploadModule],
   controllers: [AppController],
   providers: [AppService],
 

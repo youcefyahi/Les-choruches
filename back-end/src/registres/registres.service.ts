@@ -1,24 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { RegistreFirestoreService } from '../firestore/registre-firestore.service';
+import { ApiculteurFirestoreService } from '../firestore/apiculteur-firestore.service'; // ✅ AJOUTÉ
 import { RegistreElevage } from '../Models/RegistreElevage';
 
 @Injectable()
 export class RegistresService {
-  constructor(private firestoreService: FirestoreService) { }
+  constructor(
+    private registreFirestoreService: RegistreFirestoreService, // ✅ RENOMMÉ
+    private apiculteurFirestoreService: ApiculteurFirestoreService // ✅ AJOUTÉ
+  ) { }
 
   async createRegistre(registreData: Omit<RegistreElevage, 'id' | 'createdAt' | 'updatedAt'>) {
     try {
       // Vérifier que l'apiculteur existe
-      const apiculteur = await this.firestoreService.getApiculteur(registreData.apiculteurId);
+      const apiculteur = await this.apiculteurFirestoreService.getApiculteur(registreData.apiculteurId); // ✅ CHANGÉ
       if (!apiculteur) {
         throw new Error('Apiculteur introuvable');
       }
 
       // Créer le registre dans Firestore
-      const registreId = await this.firestoreService.createRegistre(registreData);
+      const registreId = await this.registreFirestoreService.createRegistre(registreData); // ✅ CHANGÉ
 
       // Récupérer le registre créé pour le retourner
-      const nouveauRegistre = await this.firestoreService.getRegistre(registreId);
+      const nouveauRegistre = await this.registreFirestoreService.getRegistre(registreId); // ✅ CHANGÉ
 
       return {
         success: true,
@@ -38,7 +42,7 @@ export class RegistresService {
         ...observationData
       };
 
-      await this.firestoreService.addObservationToRegistre(registreId, observation);
+      await this.registreFirestoreService.addObservationToRegistre(registreId, observation); // ✅ CHANGÉ
 
       return observation;
     } catch (error) {
@@ -49,13 +53,13 @@ export class RegistresService {
   async getRegistresByApiculteur(apiculteurId: string) {
     try {
       // Vérifier que l'apiculteur existe
-      const apiculteur = await this.firestoreService.getApiculteur(apiculteurId);
+      const apiculteur = await this.apiculteurFirestoreService.getApiculteur(apiculteurId); // ✅ CHANGÉ
       if (!apiculteur) {
         throw new Error('Apiculteur introuvable');
       }
 
       // Récupérer tous les registres de cet apiculteur
-      const registres = await this.firestoreService.getRegistresByApiculteur(apiculteurId);
+      const registres = await this.registreFirestoreService.getRegistresByApiculteur(apiculteurId); // ✅ CHANGÉ
 
       return {
         success: true,
@@ -69,7 +73,7 @@ export class RegistresService {
 
   async getRegistre(registreId: string) {
     try {
-      const registre = await this.firestoreService.getRegistre(registreId);
+      const registre = await this.registreFirestoreService.getRegistre(registreId); // ✅ CHANGÉ
 
       if (!registre) {
         throw new Error('Registre introuvable');
@@ -86,10 +90,10 @@ export class RegistresService {
   }
 
   async updateRegistre(id: string, data: Partial<RegistreElevage>) {
-    return await this.firestoreService.updateRegistre(id, data);
+    return await this.registreFirestoreService.updateRegistre(id, data); // ✅ CHANGÉ
   }
 
-  // // DEPLACEMENNT // // 
+  // // DEPLACEMENT // // 
 
   async addDeplacement(registreId: string, deplacementData: { date: Date; nouvelleAdresse: string }) {
     try {
@@ -98,15 +102,13 @@ export class RegistresService {
         ...deplacementData
       };
 
-      await this.firestoreService.addDeplacementToRegistre(registreId, deplacement);
+      await this.registreFirestoreService.addDeplacementToRegistre(registreId, deplacement); // ✅ CHANGÉ
 
       return deplacement;
     } catch (error) {
       throw new Error(`Error adding deplacement: ${error.message}`);
     }
   }
-
-  // // DEPLACEMENNT // // 
 
   // // RECOLTE // // 
 
@@ -117,7 +119,7 @@ export class RegistresService {
         ...recolteData
       };
 
-      await this.firestoreService.addRecolteToRegistre(registreId, recolte);
+      await this.registreFirestoreService.addRecolteToRegistre(registreId, recolte); // ✅ CHANGÉ
 
       return recolte;
     } catch (error) {
@@ -133,7 +135,7 @@ export class RegistresService {
         ...traitementData
       };
 
-      await this.firestoreService.addTraitementVarroaToRegistre(registreId, traitement);
+      await this.registreFirestoreService.addTraitementVarroaToRegistre(registreId, traitement); // ✅ CHANGÉ
 
       return traitement;
     } catch (error) {
@@ -141,7 +143,7 @@ export class RegistresService {
     }
   }
 
-  // // NOURISSEMENT // // 
+  // // NOURRISSEMENT // // 
 
   async addNourrissement(registreId: string, nourrissementData: { date: Date; quantite: number; produit: string }) {
     try {
@@ -150,7 +152,7 @@ export class RegistresService {
         ...nourrissementData
       };
 
-      await this.firestoreService.addNourrissementToRegistre(registreId, nourrissement);
+      await this.registreFirestoreService.addNourrissementToRegistre(registreId, nourrissement); // ✅ CHANGÉ
 
       return nourrissement;
     } catch (error) {
@@ -166,7 +168,7 @@ export class RegistresService {
         ...maladieTraitementData
       };
 
-      await this.firestoreService.addMaladieTraitementToRegistre(registreId, maladieTraitement);
+      await this.registreFirestoreService.addMaladieTraitementToRegistre(registreId, maladieTraitement); // ✅ CHANGÉ
 
       return maladieTraitement;
     } catch (error) {

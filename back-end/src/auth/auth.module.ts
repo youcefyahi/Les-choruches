@@ -1,14 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard'; // ← Ajouter
-import { FirestoreModule } from '../firestore/firestore.module';
-import { AdminGuard } from './admin.guard';
-
+import { FirestoreModule } from '../firestore/firestore.module'; // ✅ AJOUTER
 
 @Module({
-  controllers: [AuthController,FirestoreModule],
-  providers: [AuthService, AuthGuard,AdminGuard], // ← Ajouter AuthGuard
-  exports: [AuthService, AuthGuard,AdminGuard], // ← Exporter AuthGuard
+  imports: [FirestoreModule], // ✅ AJOUTER
+  controllers: [AuthController],
+  providers: [AuthService],
 })
 export class AuthModule {}

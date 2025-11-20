@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { CompteRenduFirestoreService } from '../firestore/compte-rendu-firestore.service'; // ✅ CHANGÉ
 
 @Injectable()
 export class CleanupService {
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(
+    private compteRenduFirestoreService: CompteRenduFirestoreService // ✅ CHANGÉ
+  ) {}
 
   // Tâche qui s'exécute tous les jours à 2h du matin
   @Cron('0 2 * * *') 
@@ -18,7 +20,7 @@ export class CleanupService {
     
     console.log('🗑️ Suppression des données temporaires > 2 jours:', twoDaysAgo);
     
-    // ✅ SEULEMENT les comptes rendus temporaires > 2 jours
-    await this.firestoreService.deleteTemporaryComptesRendus(twoDaysAgo);
+    // ✅ Appel via le service spécialisé
+    await this.compteRenduFirestoreService.deleteTemporaryComptesRendus(twoDaysAgo); // ✅ CHANGÉ
   }
 }

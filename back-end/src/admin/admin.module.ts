@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { FirebaseModule } from '../firebase.module';
-import { BaseFirestoreService } from 'src/firestore/base-firestore.service';
+import { FirestoreModule } from '../firestore/firestore.module'; // ✅ CHANGÉ
 
 @Module({
-  imports: [FirebaseModule],  // ← Seulement FirebaseModule
+  imports: [FirestoreModule], // ✅ FirestoreModule au lieu de FirebaseModule
   controllers: [AdminController],
-  providers: [AdminService,BaseFirestoreService],
+  providers: [AdminService], // ✅ PAS BESOIN de BaseFirestoreService
 })
 export class AdminModule {}

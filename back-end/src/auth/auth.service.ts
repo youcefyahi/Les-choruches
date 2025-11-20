@@ -4,22 +4,21 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from 'firebase/auth';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { ApiculteurFirestoreService } from '../firestore/apiculteur-firestore.service'; // ✅ CHANGÉ
 import type { Auth } from 'firebase/auth';
-
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject('FIREBASE_AUTH') private auth: Auth,
-    private firestoreService: FirestoreService
+    private apiculteurFirestoreService: ApiculteurFirestoreService // ✅ CHANGÉ
   ) {}
 
   async register(email: string, password: string, firstName: string, lastName: string, phone?: string) {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
     const firebaseUser = userCredential.user;
 
-    await this.firestoreService.createApiculteur({
+    await this.apiculteurFirestoreService.createApiculteur({ // ✅ CHANGÉ
       email,
       firstName,
       lastName,
@@ -37,7 +36,7 @@ export class AuthService {
     const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
     const firebaseUser = userCredential.user;
 
-    const apiculteur = await this.firestoreService.getApiculteurByEmail(email);
+    const apiculteur = await this.apiculteurFirestoreService.getApiculteurByEmail(email); // ✅ CHANGÉ
 
     return {
       uid: firebaseUser.uid,
