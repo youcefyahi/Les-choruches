@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ComptesRendusController } from './compte-rendu.controller';
 import { CompteRenduService } from './compte-rendu.service';
-import { FirebaseModule } from '../firebase.module';
-import { FirestoreService } from 'src/firestore/base-firestore.service';
+import { FirestoreModule } from '../firestore/firestore.module'; // ✅ CHANGÉ
 import { LinkedInModule } from '../linkedin/linkedin.module';  
 import { EmailModule } from '../email/email.module';            
 
 @Module({
-  imports: [FirebaseModule,LinkedInModule,EmailModule],
+  imports: [FirestoreModule, LinkedInModule, EmailModule], // ✅ FirestoreModule au lieu de FirebaseModule
   controllers: [ComptesRendusController],
-  providers: [CompteRenduService,FirestoreService],
-  exports: [CompteRenduService],  // ← Exporte le service pour MurModule
+  providers: [CompteRenduService], // ✅ PAS BESOIN de CompteRenduFirestoreService ici
+  exports: [CompteRenduService],
 })
 export class ComptesRendusModule { }

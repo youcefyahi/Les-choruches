@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { EntreprisesController } from './entreprises.controller';
 import { EntreprisesService } from './entreprises.service';
-import { FirebaseModule } from '../firebase.module';
-import { FirestoreService } from 'src/firestore/base-firestore.service';
+import { EntrepriseFirestoreService } from 'src/firestore/entreprise-firestore.service';
+import { FirestoreModule } from 'src/firestore/firestore.module';
 
 @Module({
-  imports: [FirebaseModule],
+  imports: [FirestoreModule],
   controllers: [EntreprisesController],
-  providers: [EntreprisesService,FirestoreService],
+  providers: [EntreprisesService,EntrepriseFirestoreService],
 })
 export class EntreprisesModule {}

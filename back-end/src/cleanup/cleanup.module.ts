@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CleanupService } from './cleanup.service';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { FirestoreModule } from '../firestore/firestore.module'; // ✅ IMPORTER
 
 @Module({
-  providers: [CleanupService, FirestoreService],
-  exports: [CleanupService]
+  imports: [FirestoreModule], // ✅ AJOUTER
+  providers: [CleanupService],
 })
 export class CleanupModule {}

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { EntrepriseFirestoreService } from 'src/firestore/entreprise-firestore.service';
 import { Entreprise } from '../Models/Entreprise';
 
 @Injectable()
 export class EntreprisesService {
-  constructor(private readonly firestoreService: FirestoreService) {}
+  constructor(private readonly entrepriseFirestoreService: EntrepriseFirestoreService) {}
 
   async createEntreprise(data: Omit<Entreprise, 'id' | 'createdAt' | 'updatedAt'>) {
     try {
-      const entrepriseId = await this.firestoreService.createEntreprise(data);
+      const entrepriseId = await this.entrepriseFirestoreService.createEntreprise(data);
       return {
         success: true,
         message: 'Entreprise créée avec succès',
@@ -21,7 +21,7 @@ export class EntreprisesService {
 
   async getAllEntreprises() {
     try {
-      const entreprises = await this.firestoreService.getAllEntreprises();
+      const entreprises = await this.entrepriseFirestoreService.getAllEntreprises();
       return {
         success: true,
         entreprises,
@@ -33,7 +33,7 @@ export class EntreprisesService {
 
   async getEntrepriseById(id: string) {
     try {
-      const entreprise = await this.firestoreService.getEntrepriseById(id);
+      const entreprise = await this.entrepriseFirestoreService.getEntrepriseById(id);
       
       if (!entreprise) {
         throw new Error('Entreprise introuvable');
@@ -50,7 +50,7 @@ export class EntreprisesService {
 
   async updateEntreprise(id: string, data: Partial<Entreprise>) {
     try {
-      await this.firestoreService.updateEntreprise(id, data);
+      await this.entrepriseFirestoreService.updateEntreprise(id, data);
       return {
         success: true,
         message: 'Entreprise mise à jour avec succès',
@@ -62,7 +62,7 @@ export class EntreprisesService {
 
   async deleteEntreprise(id: string) {
     try {
-      await this.firestoreService.deleteEntreprise(id);
+      await this.entrepriseFirestoreService.deleteEntreprise(id);
       return {
         success: true,
         message: 'Entreprise supprimée avec succès',

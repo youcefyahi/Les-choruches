@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { RendezVousFirestoreService } from '../firestore/rendez-vous-firestore.service'; // ✅ CHANGÉ
 import { RendezVous } from '../Models/RendezVous';
 
 @Injectable()
 export class RendezVousService {
-  constructor(private readonly firestoreService: FirestoreService) {}
+  constructor(
+    private readonly rendezVousFirestoreService: RendezVousFirestoreService // ✅ CHANGÉ
+  ) {}
 
   async createRendezVous(data: Omit<RendezVous, 'id' | 'createdAt' | 'updatedAt'>) {
     try {
-      const rdvId = await this.firestoreService.createRendezVous(data);
+      const rdvId = await this.rendezVousFirestoreService.createRendezVous(data); // ✅ CHANGÉ
       
       return {
         success: true,
@@ -22,7 +24,7 @@ export class RendezVousService {
 
   async getRendezVousByApiculteur(apiculteurId: string) {
     try {
-      const rendezVous = await this.firestoreService.getRendezVousByApiculteur(apiculteurId);
+      const rendezVous = await this.rendezVousFirestoreService.getRendezVousByApiculteur(apiculteurId); // ✅ CHANGÉ
       
       return {
         success: true,
@@ -35,7 +37,7 @@ export class RendezVousService {
 
   async getRendezVousByEntreprise(entrepriseId: string) {
     try {
-      const rendezVous = await this.firestoreService.getRendezVousByEntreprise(entrepriseId);
+      const rendezVous = await this.rendezVousFirestoreService.getRendezVousByEntreprise(entrepriseId); // ✅ CHANGÉ
       
       return {
         success: true,
@@ -48,7 +50,7 @@ export class RendezVousService {
 
   async updateRendezVous(id: string, data: Partial<RendezVous>) {
     try {
-      await this.firestoreService.updateRendezVous(id, data);
+      await this.rendezVousFirestoreService.updateRendezVous(id, data); // ✅ CHANGÉ
       
       return {
         success: true,

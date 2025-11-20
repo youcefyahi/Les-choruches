@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from 'firebase/auth';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { AdminFirestoreService } from '../firestore/admin-firestore.service';
 import type { Auth } from 'firebase/auth';
 import * as admin from 'firebase-admin';
 
@@ -12,7 +12,7 @@ import * as admin from 'firebase-admin';
 export class AdminService {
   constructor(
     @Inject('FIREBASE_AUTH') private auth: Auth,
-    private firestoreService: FirestoreService
+    private firestoreService: AdminFirestoreService
   ) { }
 
   async register(email: string, password: string, firstName: string, lastName: string, phone?: string) {

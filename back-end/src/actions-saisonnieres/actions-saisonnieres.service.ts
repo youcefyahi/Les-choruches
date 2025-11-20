@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { FirestoreService } from '../firestore/base-firestore.service';
+import { Injectable, Inject } from '@nestjs/common';
+import { Firestore } from 'firebase/firestore'; // ✅ AJOUTÉ
 import { ActionSaisonniere } from '../Models/actions-saisonnieres/ActionSaisonniere';
 import { CreateActionSaisonniere } from '../Models/actions-saisonnieres/CreateActionSaisonniere';
 import { UpdateActionSaisonniere } from '../Models/actions-saisonnieres/UpdateActionSaisonniere';
@@ -7,12 +7,14 @@ import { addDoc, collection, getDocs, doc, updateDoc, deleteDoc, query, where, o
 
 @Injectable()
 export class ActionsSaisonnieresService {
-  constructor(private readonly firestoreService: FirestoreService) {}
+  constructor(
+    @Inject('FIRESTORE') private readonly firestore: Firestore // ✅ CHANGÉ ICI
+  ) {}
 
   // Créer une nouvelle action saisonnière
   async createAction(actionData: CreateActionSaisonniere): Promise<string> {
     const now = new Date();
-    const docRef = await addDoc(collection(this.firestoreService.getFirestore(), 'actions_saisonnieres'), {
+    const docRef = await addDoc(collection(this.firestore, 'actions_saisonnieres'), { // ✅ CHANGÉ
       ...actionData,
       status: 'a_faire',
       createdAt: now,
@@ -24,7 +26,7 @@ export class ActionsSaisonnieresService {
   // Récupérer toutes les actions d'un apiculteur
   async getActionsByApiculteur(apiculteurId: string): Promise<ActionSaisonniere[]> {
     const q = query(
-      collection(this.firestoreService.getFirestore(), 'actions_saisonnieres'),
+      collection(this.firestore, 'actions_saisonnieres'), // ✅ CHANGÉ
       where('apiculteurId', '==', apiculteurId),
       orderBy('moisOptimal', 'asc')
     );
@@ -39,7 +41,7 @@ export class ActionsSaisonnieresService {
   async getActionsCurrentMonth(apiculteurId: string): Promise<ActionSaisonniere[]> {
     const currentMonth = new Date().getMonth() + 1;
     const q = query(
-      collection(this.firestoreService.getFirestore(), 'actions_saisonnieres'),
+      collection(this.firestore, 'actions_saisonnieres'), // ✅ CHANGÉ
       where('apiculteurId', '==', apiculteurId),
       where('moisOptimal', '==', currentMonth)
     );
@@ -52,7 +54,7 @@ export class ActionsSaisonnieresService {
 
   // Marquer une action comme terminée
   async completeAction(actionId: string): Promise<void> {
-    const docRef = doc(this.firestoreService.getFirestore(), 'actions_saisonnieres', actionId);
+    const docRef = doc(this.firestore, 'actions_saisonnieres', actionId); // ✅ CHANGÉ
     await updateDoc(docRef, {
       status: 'terminee',
       dateCompletion: new Date(),
@@ -62,7 +64,7 @@ export class ActionsSaisonnieresService {
 
   // Mettre à jour une action
   async updateAction(actionId: string, updateData: UpdateActionSaisonniere): Promise<void> {
-    const docRef = doc(this.firestoreService.getFirestore(), 'actions_saisonnieres', actionId);
+    const docRef = doc(this.firestore, 'actions_saisonnieres', actionId); // ✅ CHANGÉ
     await updateDoc(docRef, {
       ...updateData,
       updatedAt: new Date(),
@@ -71,7 +73,7 @@ export class ActionsSaisonnieresService {
 
   // Supprimer une action
   async deleteAction(actionId: string): Promise<void> {
-    const docRef = doc(this.firestoreService.getFirestore(), 'actions_saisonnieres', actionId);
+    const docRef = doc(this.firestore, 'actions_saisonnieres', actionId); // ✅ CHANGÉ
     await deleteDoc(docRef);
   }
 }
