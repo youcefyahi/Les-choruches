@@ -1,14 +1,12 @@
 <template>
   <div>
-    <Form />
-    <Connexion />
-    <NuxtPage/>
-
+    <NuxtLayout name="default">
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 
 <script setup>
-import Form from "./form.vue";
-import Connexion from "./Connexion.vue";
+
 
 </script>

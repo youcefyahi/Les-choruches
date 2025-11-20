@@ -1,9 +1,13 @@
-<script setup lang="ts"></script>
+
 
 <template>
   <div>
-    Page: index
+  <p>ICI UN TRUC</p>
+    <Connexion />
   </div>
 </template>
 
-<style scoped></style>
+<script setup lang="ts">
+
+import Connexion from "~/Connexion.vue";
+</script>
